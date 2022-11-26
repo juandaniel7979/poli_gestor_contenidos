@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:poli_gestor_contenidos/models/models.dart';
 
-class ProductFormProvider extends ChangeNotifier {
+class PublicationFormProvider extends ChangeNotifier {
 
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   Publication publication;
   
-  ProductFormProvider( this.publication);
+  PublicationFormProvider( this.publication);
 
   updateAvailability(bool value ) {
     print(value);

@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 import 'package:image_picker/image_picker.dart';
+import 'package:poli_gestor_contenidos/forms/publication_form_provider.dart';
 import 'package:poli_gestor_contenidos/providers/providers.dart';
 import 'package:poli_gestor_contenidos/services/publications_services.dart';
 import 'package:provider/provider.dart';
-
-import 'package:poli_gestor_contenidos/providers/product_form_provider.dart';
 import 'package:poli_gestor_contenidos/ui/input_decorations.dart';
 import 'package:poli_gestor_contenidos/widgets/widgets.dart';
 
@@ -23,7 +21,7 @@ class PublicationEditScreen extends StatelessWidget {
 
 
     return ChangeNotifierProvider(
-      create: ( _ ) => ProductFormProvider( publicationService.selectedPublication ),
+      create: ( _ ) => PublicationFormProvider( publicationService.selectedPublication ),
       child: _ProductScreenBody(publicationService: publicationService),
       );
   }
@@ -39,7 +37,7 @@ class _ProductScreenBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final publicationForm = Provider.of<ProductFormProvider>(context); 
+    final publicationForm = Provider.of<PublicationFormProvider>(context); 
     return Scaffold(
       body: SingleChildScrollView(
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
@@ -120,7 +118,7 @@ class _PublicationForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
   
-  final publicationForm = Provider.of<ProductFormProvider>(context);
+  final publicationForm = Provider.of<PublicationFormProvider>(context);
   final publication = publicationForm.publication;
   final themeProvider = Provider.of<ThemeProvider>(context);
     return Padding(

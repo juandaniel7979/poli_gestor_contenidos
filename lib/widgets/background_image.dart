@@ -43,8 +43,10 @@ class BackgroundImage extends StatelessWidget {
   }
 
   Widget getImage( String? picture) {
+    print("picture");
+    print(picture);
     
-    if( picture == null) {
+    if( picture == null || picture == "") {
       return const Image(
               image: AssetImage('assets/no-image.png'),
               fit: BoxFit.cover

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "382195778061",
+    "project_id": "poli-gestor-de-contenidos",
+    "storage_bucket": "poli-gestor-de-contenidos.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:382195778061:android:18bf264eb614bc80c64b44",
+        "android_client_info": {
+          "package_name": "com.juandev.poli_gestor_contenidos"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "382195778061-42oh0mmbk1vnir3r7317qk4oi3ev7pmp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.juandev.poli_gestor_contenidos",
+            "certificate_hash": "cd4070d7b114e7b7344ff5d8b317debf220bcf9d"
+          }
+        },
+        {
+          "client_id": "382195778061-nhdov5mitm66bj63ctt5lj02teogfper.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC0O_V9iuDG7R7gTuoBE1fTXRRmMhrqLlw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "382195778061-nhdov5mitm66bj63ctt5lj02teogfper.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

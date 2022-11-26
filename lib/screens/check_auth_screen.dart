@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:poli_gestor_contenidos/screens/home_screen.dart';
+import 'package:poli_gestor_contenidos/screens/list_categories_screen.dart';
 import 'package:poli_gestor_contenidos/screens/login_screen.dart';
 import 'package:poli_gestor_contenidos/services/auth_services.dart';
 import 'package:provider/provider.dart';
 
 class CheckAuthScreen extends StatelessWidget {
+  static const routerName = "check-auth-screen";
 
   const CheckAuthScreen({Key? key}) : super(key: key);
   
@@ -31,8 +33,8 @@ class CheckAuthScreen extends StatelessWidget {
           }else{
             Future.microtask(() {
               Navigator.pushReplacement(context, PageRouteBuilder(
-                pageBuilder: ( _, __, ___) => HomeScreen(),
-                transitionDuration: Duration(seconds: 0)
+                pageBuilder: ( _, __, ___) => const ListCategoriesScreen(),
+                transitionDuration: const Duration(seconds: 0)
               )
             );
             });

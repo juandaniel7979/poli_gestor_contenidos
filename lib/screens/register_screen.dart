@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:poli_gestor_contenidos/providers/providers.dart';
 import 'package:poli_gestor_contenidos/screens/login_screen.dart';
 import 'package:poli_gestor_contenidos/services/services.dart';
+import 'package:poli_gestor_contenidos/share_preferences/preferences.dart';
 import 'package:poli_gestor_contenidos/themes/app_theme.dart';
 import 'package:provider/provider.dart';
 import 'package:poli_gestor_contenidos/ui/input_decorations.dart';
@@ -28,11 +29,11 @@ class RegisterScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       const SizedBox( height: 10,),
-                      Text('Crear cuenta', style: Theme.of(context).textTheme.headline4,),
+                      Text('Crear cuenta', style: TextStyle(color: Preferences.isDarkMode ?  Colors.white : Colors.black, fontSize: 26, fontWeight: FontWeight.bold)),
                       const SizedBox( height:30,),   
                       ChangeNotifierProvider(
                         create:  ( _ ) => LoginFormProvider(),
-                        child: _LoginForm(),
+                        child: _RegisterForm(),
                       ),
                     ],
                   ),
@@ -44,7 +45,7 @@ class RegisterScreen extends StatelessWidget {
                     overlayColor: MaterialStateProperty.all(Colors.indigo.withOpacity(0.1)),
                     shape: MaterialStateProperty.all( const StadiumBorder())
                   ),
-                  child: const Text('¿Ya tienes una cuenta?', style: TextStyle( fontSize: 18, color: Colors.black87),)
+                  child: Text('¿Ya tienes una cuenta?', style: TextStyle( fontSize: 18, color: Preferences.isDarkMode ? Colors.white : Colors.black87 ),)
                 ),
                 const SizedBox( height: 50,)
                 
@@ -58,7 +59,7 @@ class RegisterScreen extends StatelessWidget {
   }
 }
 
-class _LoginForm extends StatelessWidget {
+class _RegisterForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
@@ -78,11 +79,10 @@ class _LoginForm extends StatelessWidget {
                     print(loginForm.rol);
                   }
                   break;
-
                 }
               },
               labelColor: Colors.white,
-              unselectedLabelColor: Colors.grey,
+              unselectedLabelColor:Colors.grey,
               indicator: BoxDecoration(
                 color: AppTheme.primary,
                 borderRadius: BorderRadius.circular(10)
@@ -134,13 +134,14 @@ class _FormRegister extends StatelessWidget {
               },
             ),
           ),
+          SizedBox(height: 10,),
           // Nombres
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Flexible(
                 child: Padding(
-                  padding: const EdgeInsets.only(left: 4, right: 4),
+                  padding: const EdgeInsets.all(4),
                   child: TextFormField(
                               autocorrect: false,
                               keyboardType: TextInputType.text,
@@ -181,7 +182,7 @@ class _FormRegister extends StatelessWidget {
             children: [
               Flexible(
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(4),
                   child: TextFormField(
                               autocorrect: false,
                               keyboardType: TextInputType.text,
@@ -201,7 +202,7 @@ class _FormRegister extends StatelessWidget {
               ),
             Flexible(
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(4),
                 child: TextFormField(
                   autocorrect: false,
                   keyboardType: TextInputType.text,
@@ -216,46 +217,52 @@ class _FormRegister extends StatelessWidget {
             ),
             ],
           ),
-          SizedBox(height: 30,),
-          TextFormField(
-            autocorrect: false,
-            keyboardType: TextInputType.emailAddress,
-            decoration: InputDecorations.authInputDecoration(
-              hintText: 'john.doe@gmail.com',
-              color: themeProvider.currentTheme.backgroundColor,
-              label: 'Correo electronico',
-              prefixIcon: Icons.alternate_email_sharp
+          SizedBox(height: 10,),
+          Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: TextFormField(
+              autocorrect: false,
+              keyboardType: TextInputType.emailAddress,
+              decoration: InputDecorations.authInputDecoration(
+                hintText: 'john.doe@gmail.com',
+                color: themeProvider.currentTheme.backgroundColor,
+                label: 'Correo electronico',
+                prefixIcon: Icons.alternate_email_sharp
+              ),
+              onChanged: (value) => loginForm.correo = value,
+              validator: ( value ) {
+                String pattern = r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+                RegExp regExp  = RegExp(pattern);
+                return regExp.hasMatch(value ?? '')
+                ? null
+                : 'El valor ingresado no luce como un correo';
+              },
             ),
-            onChanged: (value) => loginForm.correo = value,
-            validator: ( value ) {
-              String pattern = r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
-              RegExp regExp  = RegExp(pattern);
-              return regExp.hasMatch(value ?? '')
-              ? null
-              : 'El valor ingresado no luce como un correo';
-            },
           ),
       
-          const SizedBox( height: 30,),
+          const SizedBox( height: 10,),
           
-          TextFormField(
-            autocorrect: false,
-            obscureText: true,
-            keyboardType: TextInputType.text,
-            decoration: InputDecorations.authInputDecoration(
-              hintText: '*****',
-              color: themeProvider.currentTheme.backgroundColor,
-              label: 'Contraseña',
-              prefixIcon: Icons.lock_outline
+          Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: TextFormField(
+              autocorrect: false,
+              obscureText: true,
+              keyboardType: TextInputType.text,
+              decoration: InputDecorations.authInputDecoration(
+                hintText: '*****',
+                color: themeProvider.currentTheme.backgroundColor,
+                label: 'Contraseña',
+                prefixIcon: Icons.lock_outline
+              ),
+              onChanged: (value) => loginForm.contrasena = value,
+              validator: ( value ) {
+                
+                return ( value != null && value.length >= 6) ? null: 'La contraseña ingresada es incorrecta';
+              },
             ),
-            onChanged: (value) => loginForm.contrasena = value,
-            validator: ( value ) {
-              
-              return ( value != null && value.length >= 6) ? null: 'La contraseña ingresada es incorrecta';
-            },
           ),
           
-          const SizedBox( height: 30,),
+          const SizedBox( height: 15,),
       
           MaterialButton(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -270,7 +277,7 @@ class _FormRegister extends StatelessWidget {
               loginForm.isLoading = true;
               // await Future.delayed(const Duration(seconds: 2));
               
-              final String? errorMessage = await authService.createUser( loginForm.uid, loginForm.correo, loginForm.contrasena, loginForm.nombre, loginForm.nombre2, loginForm.apellido, loginForm.apellido2, loginForm.rol);
+              final String? errorMessage = await authService.createUser( loginForm.uid, loginForm.correo, loginForm.contrasena, loginForm.nombre, loginForm.nombre2, loginForm.apellido, loginForm.apellido2, loginForm.rol).timeout(const Duration(milliseconds: 12000));
       
               if( errorMessage == null ) {
       
@@ -286,7 +293,7 @@ class _FormRegister extends StatelessWidget {
               child: Text(
                 loginForm.isLoading
                 ? 'Espere..'
-                :'Ingresar',
+                :'Crear cuenta',
               style: const TextStyle(color: Colors.white),),
             ),)
         ],

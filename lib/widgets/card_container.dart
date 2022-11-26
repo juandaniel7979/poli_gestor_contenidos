@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:poli_gestor_contenidos/share_preferences/preferences.dart';
 
 class CardContainer extends StatelessWidget {
 
@@ -21,7 +22,7 @@ class CardContainer extends StatelessWidget {
   }
 
   BoxDecoration _createCardShape() => BoxDecoration(
-    color: Colors.white,
+    color: Preferences.isDarkMode ? Colors. black87 : Colors.white ,
     borderRadius: BorderRadius.circular(25),
     boxShadow: const [
       BoxShadow(

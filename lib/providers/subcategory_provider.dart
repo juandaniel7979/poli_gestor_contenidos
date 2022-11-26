@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:poli_gestor_contenidos/models/Subcategory.dart';
+import 'package:poli_gestor_contenidos/models/subcategory.dart';
 import 'package:poli_gestor_contenidos/models/tags_model.dart';
 
 // TODO: Corregir url con ip local
@@ -13,8 +13,6 @@ class SubcategoryProvider with ChangeNotifier {
 
 // final _APIKEY = 'eae7a8c6d2f840d1a2595dafe0a195df';
   final _baseURL = 'http://192.168.56.1:3001';
-  String _selectedTag = 'business';
-  List<String> selectedTags = [];
   List <Subcategoria> subcategorias = [];
   Subcategoria selectedSubcategory = Subcategoria(
     nombre: '',
@@ -23,23 +21,13 @@ class SubcategoryProvider with ChangeNotifier {
     idCategoria: '',
     idProfesor: '',
     descripcion: '',
-    imagen: ''    
+    imagen: null    
     );
   bool _isLoading = true;
   bool isSaving= false;
   final storage = const FlutterSecureStorage();
 
   File? newPictureFile;
-
-  List <Tag> tags = [
-    Tag( FontAwesomeIcons.building, 'Negocios'),
-    Tag( FontAwesomeIcons.tv, 'Entretenimiento'),
-    Tag( FontAwesomeIcons.addressCard, 'General'),
-    Tag( FontAwesomeIcons.headSideVirus, 'Salud'),
-    Tag( FontAwesomeIcons.vials, 'Ciencias'),
-    Tag( FontAwesomeIcons.volleyball, 'Deportes'),
-    Tag( FontAwesomeIcons.memory, 'Tecnologia'),    
-  ];
 
   Subcategoria sub = Subcategoria(
     nombre: '',
@@ -53,35 +41,30 @@ class SubcategoryProvider with ChangeNotifier {
 
   Map<String,List<Subcategoria>> categoriesByTag = {};
   
-  SubcategoryProvider() {
-    // getTopSubcategorias();
-    // tags.forEach((item) {
-    //   categoriesByTag[item.name] = List<Subcategoria>.empty(growable: true);
-    // });
-    // getCategoriesPorTag( _selectedTag );
-  } 
+  SubcategoryProvider() {} 
 
   
   bool get isLoading => _isLoading;
 
-  String get selectedTag => _selectedTag;
-
-  set selectedTag( String valor ) {
-    _selectedTag = valor;
-    
+  getSubcategoriasPorId(String id) async {
     _isLoading = true;
-    // getCategoriesPorTag( valor );
     notifyListeners();
+    final url = '$_baseURL/api/subcategoria/${id}';
+    print(url);
+    final resp = await http.get(Uri.parse(url));
+    print(resp.body);
+    final subcategoryResponse = Subcategory.fromJson( resp.body );
+    subcategorias.addAll( subcategoryResponse.subcategorias);
+    _isLoading = false;
+    notifyListeners();
+    return null;
   }
 
-  List<Subcategoria> get getSubcategoriasPorTag => categoriesByTag[selectedTag]!;
-
-  getTopSubcategorias() async {
+  getSubcategorias() async {
     _isLoading = true;
     notifyListeners();
-    // print(selectedSubcategory.idCategoria );
     if(selectedSubcategory.idCategoria != null || selectedSubcategory.idCategoria != '' ) {
-    final url = '${_baseURL}/api/subcategoria/${selectedSubcategory.idCategoria }';
+    final url = '$_baseURL/api/subcategoria/${selectedSubcategory.idCategoria}';
     print(url);
     final resp = await http.get(Uri.parse(url)).timeout(const Duration(milliseconds: 8000));
     print(resp.body);
@@ -95,28 +78,14 @@ class SubcategoryProvider with ChangeNotifier {
     return 'error';
   }
 
-  // getCategoriesPorTag( String tag ) async {
-  //   if( categoriesByTag[tag]!.isNotEmpty ) {
-  //     _isLoading = false;
-  //     notifyListeners();
-  //     return categoriesByTag[tag];
-  //   }
-  //   final url = '$_baseURL/top-headlines?tag=$tag';
-  //   final resp = await http.get(Uri.parse(url));
-  //   final subcategoryResponse = Category.fromJson( resp.body );
-  //   categoriesByTag[tag]!.addAll( subcategoryResponse.Subcategorias );
-  //   _isLoading = false;
-  //   notifyListeners();
-  // }
-
   Future saveOrCreateCategoria( Subcategoria subcategoria ) async {
     isSaving = true;
     notifyListeners();
 
-    if( subcategoria.id == null) {
+    if( subcategoria.id == null || subcategoria.id == '') {
       await createSubcategory(subcategoria);
     }else{
-      print('Actualizar');
+      // print('Actualizar');
       await updateSubcategory(subcategoria);
 
     }
@@ -126,46 +95,45 @@ class SubcategoryProvider with ChangeNotifier {
   }
 
   Future updateSubcategory( Subcategoria subcategoria ) async {
-    final Map<String,dynamic> categoryData = {
+    final Map<String,dynamic> subcategoryData = {
         'nombre': subcategoria.nombre,
         'descripcion': subcategoria.descripcion,
         'estado':  subcategoria.estado,
         'imagen': subcategoria.imagen
     };
+    
+    final token = await storage.read(key: 'token') ?? '';
+    if(token ==''){ print('No hay token en el request: '); return null;}
 
-    final url = Uri.parse( '${_baseURL}/api/subcategoria/${subcategoria.id}');
-    final resp = await http.put(url, body: json.encode(categoryData),
+    print('id categoria: ${subcategoria.idCategoria}');
+    final url = Uri.parse('$_baseURL/api/subcategoria/${subcategoria.idCategoria}');
+    print('ACTUALIZAR-----------------');
+    print(url);
+    final resp = await http.put(url, body: json.encode(subcategoryData),
     headers: {
     "Content-Type": "application/json", 
-    'x-token': await storage.read(key: 'token') ?? ''
+    'x-token': token
     }
-    ,).timeout(Duration(milliseconds: 8000));
-    final decodedData = resp.body;
-    // subcategoria.forEach((element) {
-    //   if(element.id == subcategoria.id){
-    //     element.name = subcategoria.name;
-    //   }
-    // });
+    ,).timeout(const Duration(milliseconds: 8000));
 
-    // final index = Subcategorias.indexWhere((element) => element.id == subcategoria.id);
-    // Subcategorias[index] = subcategoria;
-    
+    final decodedData = resp.body;
+    print(resp.body);
     return subcategoria.id;
   }
 
 
   Future createSubcategory( Subcategoria subcategoria ) async {
-    final Map<String,dynamic> categoryData = {
+    final Map<String,dynamic> subcategoryData = {
         'nombre': subcategoria.nombre,
         'descripcion': subcategoria.descripcion,
-        'estado':  subcategoria.estado,
-        'imagen': subcategoria.imagen
     };
-    print(subcategoria.estado);
-    final url = Uri.parse( '${_baseURL}/api/subcategoria');
+    print(subcategoria.idCategoria);
+    final url = Uri.parse( '$_baseURL/api/subcategoria/${subcategoria.idCategoria}');
+    print('CREAR-----------------');
+    print(url);
     try {
     final resp = await http.post(url,
-    body: json.encode(categoryData),
+    body: json.encode(subcategoryData),
     headers: {
       "Content-Type": "application/json", 
       'x-token': await storage.read(key: 'token') ?? ''
@@ -177,6 +145,8 @@ class SubcategoryProvider with ChangeNotifier {
     final Map<String, dynamic> decodedResp = json.decode( resp.body);
 
     if( decodedResp.containsKey('id_profesor')) {
+      print('resp.body');
+      print(resp.body);
       return null;
     }else{
       print(decodedResp['errors'][0]);
@@ -190,7 +160,7 @@ class SubcategoryProvider with ChangeNotifier {
   }
 
   
-  void updateSelectedCategoryImage (String path) async {
+  void updateSelectedSubategoryImage (String path) async {
 
     selectedSubcategory.imagen = path; 
     newPictureFile = File.fromUri(Uri(path: path));

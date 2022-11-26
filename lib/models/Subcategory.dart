@@ -37,9 +37,9 @@ class Subcategoria {
     });
 
     final String id;
-    final String idCategoria;
+    String idCategoria;
     final String idProfesor;
-    final String nombre;
+    String nombre;
     String? descripcion;
     String? imagen;
     String estado;

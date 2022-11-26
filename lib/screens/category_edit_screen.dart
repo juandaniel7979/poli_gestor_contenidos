@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:poli_gestor_contenidos/providers/category_form_provider.dart';
+import 'package:poli_gestor_contenidos/forms/category_form_provider.dart';
+import 'package:poli_gestor_contenidos/models/models.dart';
 import 'package:poli_gestor_contenidos/providers/category_provider.dart';
 import 'package:poli_gestor_contenidos/providers/providers.dart';
 import 'package:poli_gestor_contenidos/share_preferences/preferences.dart';
@@ -24,13 +25,13 @@ class CategoryEditScreen extends StatelessWidget {
 
     return ChangeNotifierProvider(
       create: ( _ ) => CategoryFormProvider( categoryProvider.selectedCategory ),
-      child: _ProductScreenBody(categoryProvider: categoryProvider),
+      child: _CategoryScreenBody(categoryProvider: categoryProvider),
       );
   }
 }
 
-class _ProductScreenBody extends StatelessWidget {
-  const _ProductScreenBody({
+class _CategoryScreenBody extends StatelessWidget {
+  const _CategoryScreenBody({
     Key? key,
     required this.categoryProvider,
   }) : super(key: key);
@@ -55,33 +56,23 @@ class _ProductScreenBody extends StatelessWidget {
                     top: 60,
                     left: 15,
                     child: IconButton(
-                      onPressed: () => Navigator.of(context).pop(),
+                      onPressed: () {
+                        categoryProvider.selectedCategory = Categoria(
+                        descripcion: '',
+                        idProfesor: '',
+                        id: null,
+                        nombre: '',
+                        url: '',
+                        tags: [],
+                        suscriptores: [],
+                        estado: 'PUBLICO',
+                        );
+                        Navigator.of(context).pop();
+                      },
                       icon: const Icon( Icons.arrow_back_ios_new, size: 40, color: Colors.white,),
                     ),
                   ),
-                  Positioned(
-                    top: 60,
-                    right: 20,
-                    child: IconButton(
-                      onPressed: () async {
-                        
-                        final picker = ImagePicker();
-                        final XFile? pickedFile = await picker.pickImage(
-                          source: ImageSource.camera,
-                          // source: ImageSource.gallery,
-                          imageQuality: 100
-                          ); 
-    
-                          if( pickedFile == null) {
-                            print('No seleccionó nada');
-                            return;
-                          }
-                          print('Tenemos imagen ${ pickedFile.path}');
-                          categoryProvider.updateSelectedCategoryImage(pickedFile.path);
-                      },
-                      icon: const Icon( Icons.camera_alt_outlined, size: 40, color: Colors.white,),
-                    ),
-                  ),
+                  _SelectImageIcon(categoryProvider: categoryProvider),
                 ],
               ),
               
@@ -118,7 +109,9 @@ class _ProductScreenBody extends StatelessWidget {
   }
 }
 
-class _CategoryForm extends StatelessWidget {
+
+
+class _CategoryForm extends StatefulWidget {
 
 
   const _CategoryForm({
@@ -126,20 +119,43 @@ class _CategoryForm extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<_CategoryForm> createState() => _CategoryFormState();
+}
+
+class _CategoryFormState extends State<_CategoryForm> {
+  @override
   Widget build(BuildContext context) {
   
   final categoryForm = Provider.of<CategoryFormProvider>(context);
-  final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+  // final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
   final categoria = categoryForm.categoria;
-  
+  final CategoryProvider categoryProvider = Provider.of<CategoryProvider>(context);
+
+
+  List<Tag> TagsImport = categoryProvider.copyTags;
+
+    @override
+      initState() {
+        for (var i = 0; i < TagsImport.length; i++) {
+          if(categoryProvider.selectedCategory.tags.contains(TagsImport[i].name)){
+            TagsImport[i].isSelected = true;
+          }
+        }
+        setState(() {
+          
+        });
+
+      }
+
     return Column(
       children: [
         Padding(
           padding: const EdgeInsets.symmetric( horizontal:  10),
           child: Container(
             padding: const EdgeInsets.symmetric( horizontal: 20),
-            width: double.infinity,
+            // width: double.infinity,
             height: 450,
+            // TODO
             decoration: _buildBoxDecoration(),
             child: Form(
               key: categoryForm.formKey,
@@ -149,7 +165,7 @@ class _CategoryForm extends StatelessWidget {
                   children: [
                     const SizedBox(height: 10),
                     TextFormField(
-                      style: TextStyle(color: Preferences.isDarkMode ? Colors.black : Colors.white),
+                      style: TextStyle(color: Preferences.isDarkMode ? Colors.white : Colors.black),
                       initialValue: categoria.nombre,
                       onChanged: (value) => categoria.nombre = value,
                       validator: (value) {
@@ -165,7 +181,7 @@ class _CategoryForm extends StatelessWidget {
                     ),
                     const SizedBox(height: 20),
                     TextFormField(
-                      style: TextStyle(color: Preferences.isDarkMode ? Colors.black : Colors.white),
+                      style: TextStyle(color: Preferences.isDarkMode ? Colors.white : Colors.black),
                       initialValue: categoria.descripcion,
                       onChanged: (value) => categoria.descripcion = value,
                       validator: (value) {
@@ -181,7 +197,78 @@ class _CategoryForm extends StatelessWidget {
                     ),
                     
                     const SizedBox( height: 30,),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Wrap(
+                        spacing: 6,
+                        children: <Widget>[
+                          ...List.generate(
+                            TagsImport.length,
+                            (i) => FilterChip(
+                              selected: TagsImport[i].isSelected,
+                              onSelected: (bool selected) {
+                                setState(() {
+                                  TagsImport[i].isSelected = selected;
 
+                                  print(TagsImport[i].name);
+                                  print(categoria.tags);
+                                });
+                                if (TagsImport[i].isSelected) {
+                                  categoria.tags.removeWhere((String name) {
+                                    return name == categoria.tags;
+                                  });
+                                } else {
+                                  if(!categoria.tags.contains(TagsImport[i].name)){
+                                    categoria.tags.add(TagsImport[i].name);
+                                  }
+                                }
+                              },
+                            
+                              labelStyle: const TextStyle(fontSize: 10),
+                              backgroundColor: TagsImport[i].color,
+                              label: Text(TagsImport[i].name)
+                              ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Divider(color: Colors.black),
+                    // const SizedBox( height: 10,),
+                    
+                    
+                    // tagsCategoria.length >0 || tagsCategoria != null
+                    // ? SingleChildScrollView(
+                    //   scrollDirection: Axis.horizontal,
+                    //   child: Wrap(
+                    //     spacing: 6,
+                    //     children: <Widget>[
+                    //       ...List.generate(
+                    //         tagsCategoria.length,
+                    //         (i) => GestureDetector(
+                    //           onTap: (){
+                    //             setState(() {
+                    //                 });
+                    //             // todo eliminar al tocar
+                    //             categoryProvider.selectedCategory.tags.removeWhere((String name) {
+                    //                 return categoryProvider.selectedCategory.tags.contains(name);
+                    //               });
+                    //           },
+                    //           child: Chip(
+                    //             labelStyle: const TextStyle(fontSize: 10),
+                    //             backgroundColor: categoryProvider.tags[i].color,
+                    //             label: Text(categoryProvider.tags[i].name)
+                    //             ),
+                    //         ),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // )
+                    // : Container(
+                    //   width: double.infinity,
+                    //   height: 100,
+                    //   color: Colors.red
+                    //   ),
+                    SizedBox(height: 30,),
                     TabBar(
                       onTap: (selectedRol) {
                       switch(selectedRol) {
@@ -234,4 +321,41 @@ class _CategoryForm extends StatelessWidget {
       )
     ]
   );
+}
+
+
+class _SelectImageIcon extends StatelessWidget {
+  const _SelectImageIcon({
+    Key? key,
+    required this.categoryProvider,
+  }) : super(key: key);
+
+  final CategoryProvider categoryProvider;
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      top: 60,
+      right: 20,
+      child: IconButton(
+        onPressed: () async {
+          
+          final picker = ImagePicker();
+          final XFile? pickedFile = await picker.pickImage(
+            source: ImageSource.camera,
+            // source: ImageSource.gallery,
+            imageQuality: 100
+            ); 
+    
+            if( pickedFile == null) {
+              print('No seleccionó nada');
+              return;
+            }
+            print('Tenemos imagen ${ pickedFile.path}');
+            categoryProvider.updateSelectedCategoryImage(pickedFile.path);
+        },
+        icon: const Icon( Icons.camera_alt_outlined, size: 40, color: Colors.white,),
+      ),
+    );
+  }
 }

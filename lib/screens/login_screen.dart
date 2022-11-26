@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:poli_gestor_contenidos/providers/login_form_provider.dart';
 import 'package:poli_gestor_contenidos/providers/providers.dart';
 import 'package:poli_gestor_contenidos/screens/list_categories_screen.dart';
+import 'package:poli_gestor_contenidos/screens/register_screen.dart';
+import 'package:poli_gestor_contenidos/share_preferences/preferences.dart';
 import 'package:poli_gestor_contenidos/themes/app_theme.dart';
 import 'package:poli_gestor_contenidos/ui/input_decorations.dart';
 import 'package:poli_gestor_contenidos/widgets/widgets.dart';
@@ -39,12 +40,12 @@ class LoginScreen extends StatelessWidget {
               ),
               const SizedBox( height: 50,),
               TextButton(
-                onPressed: () => Navigator.pushReplacementNamed(context, 'Registro'),
+                onPressed: () => Navigator.pushReplacementNamed(context, RegisterScreen.routerName),
                 style: ButtonStyle(
                   overlayColor: MaterialStateProperty.all(AppTheme.primary.withOpacity(0.1)),
                   shape: MaterialStateProperty.all( const StadiumBorder())
                 ),
-                child: const Text('Crear una nueva cuenta', style: TextStyle( fontSize: 18, color: Colors.black87),)
+                child: Text('Crear una nueva cuenta', style: TextStyle( fontSize: 18, color: Preferences.isDarkMode ? Colors.white : Colors.black87),)
               ),
               const SizedBox( height: 50,)
               
@@ -123,18 +124,18 @@ class _LoginForm extends StatelessWidget {
 
                 FocusScope.of(context).unfocus();
                 final authService = Provider.of<AuthService>(context, listen: false);
-                loginForm.isLoading = true;
+                // loginForm.isLoading = true;
                 final String? errorMessage = await authService.login(loginForm.correo, loginForm.contrasena);
-
+                print(errorMessage);
                 if( errorMessage == null ) {
 
                   Navigator.pushReplacementNamed(context, ListCategoriesScreen.routerName);
 
                 }else{
                   // TODO:mostrar error en pantalla
-                  // print(errorMessage);
+                  print(errorMessage);
                   NotificationsService.showSnackbar(errorMessage);
-                  loginForm.isLoading = false;
+                  // loginForm.isLoading = false;
                 }
             },
               child: Container(

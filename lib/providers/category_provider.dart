@@ -4,26 +4,51 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:poli_gestor_contenidos/models/Category.dart';
+import 'package:poli_gestor_contenidos/models/category.dart';
 import 'package:poli_gestor_contenidos/models/tags_model.dart';
 
 // TODO: Corregir url con ip local
 
 class CategoryProvider with ChangeNotifier {
 
-
   List <Tag> tags = [
-    Tag( FontAwesomeIcons.addressCard   , 'general'),
-    Tag( FontAwesomeIcons.calculator    , 'matematicas'),
-    Tag( FontAwesomeIcons.tv            , 'redes'),
-    Tag( FontAwesomeIcons.headSideVirus , 'salud'),
-    Tag( FontAwesomeIcons.vials         , 'ciencias'),
-    Tag( FontAwesomeIcons.volleyball    , 'deportes'),
-    Tag( FontAwesomeIcons.memory        , 'otros'),    
+    Tag( FontAwesomeIcons.addressCard       , 'GENERAL'             , Colors.green          , false),
+    Tag( FontAwesomeIcons.calculator        , 'MATEMATICAS'         , Colors.blue.shade600  , false),
+    Tag( FontAwesomeIcons.gears             , 'INGENIERIA'          , Colors.indigo         , false),
+    Tag( FontAwesomeIcons.tv                , 'REDES'               , Colors.cyan           , false),
+    Tag( FontAwesomeIcons.headSideVirus     , 'SOCIALES'            , Colors.orange         , false),
+    Tag( FontAwesomeIcons.vials             , 'CIENCIAS NATURALES'  , Colors.redAccent      , false),
+    Tag( FontAwesomeIcons.volleyball        , 'DEPORTES'            , Colors.amber          , false),
+    Tag( FontAwesomeIcons.suitcaseMedical   , 'MEDICINA'            , Colors.deepPurple     , false),    
+    Tag( FontAwesomeIcons.memory            , 'OTROS'               , Colors.lightGreen     , false),    
   ];
+
+
+  Color colorByTagName (String name) {
+      for (var i = 0; i < tags.length-1; i++) {
+          if( tags[i].name == name){
+            return tags[i].color;
+          }
+      }
+        return Colors.amber;
+  }
+
+  List<Tag>  get copyTags {
+      List<Tag> tagsTemp = [];
+      for (var i = 0; i < tags.length-1; i++) {
+        tagsTemp.add(tags[i]);
+        // print(tags[i].name);
+      }
+      // for (var i = 0; i < tagsTemp.length; i++) {
+      //   print(tagsTemp[i].name);
+        
+      // }
+      return tagsTemp;
+  }
 // final _APIKEY = 'eae7a8c6d2f840d1a2595dafe0a195df';
   final _baseURL = 'http://192.168.56.1:3001';
-  String _selectedTag = 'OTROS';
+  String _selectedTag = 'GENERAL';
+
   // List<String> selectedTags = [];
   List <Categoria> categorias = [];
   late Categoria selectedCategory;
@@ -84,7 +109,7 @@ class CategoryProvider with ChangeNotifier {
     headers: {
       'x-token': await storage.read(key: 'token') ?? ''
     }
-    ).timeout(Duration(milliseconds: 16000));
+    ).timeout(const Duration(milliseconds: 16000));
     print(resp.body);
     final categoryResponse = Category.fromJson( resp.body );
     categorias = [];
@@ -102,9 +127,7 @@ class CategoryProvider with ChangeNotifier {
     }else{
       print('Actualizar');
       await updateCategory(categoria);
-
     }
-
     isSaving = false;
     notifyListeners();
   }
@@ -114,26 +137,21 @@ class CategoryProvider with ChangeNotifier {
         'nombre': categoria.nombre,
         'descripcion': categoria.descripcion,
         'estado':  categoria.estado,
-        'imagen': categoria.imagen
+        'imagen': categoria.imagen,
+        'tags': categoria.tags
     };
-
-    final url = Uri.parse( '${_baseURL}/api/categoria/${categoria.id}');
+      
+      
+    final token = await storage.read(key: 'token') ?? '';
+    if(token =='' || token == null){ print('No hay token en el request: '); return null;}
+    final url = Uri.parse( '$_baseURL/api/categoria/${categoria.id}');
     final resp = await http.put(url, body: json.encode(categoryData),
     headers: {
     "Content-Type": "application/json", 
-    'x-token': await storage.read(key: 'token') ?? ''
+    'x-token': token
     }
-    ,).timeout(Duration(milliseconds: 8000));
-    final decodedData = resp.body;
-    // categoria.forEach((element) {
-    //   if(element.id == categoria.id){
-    //     element.name = categoria.name;
-    //   }
-    // });
-
-    // final index = categorias.indexWhere((element) => element.id == categoria.id);
-    // categorias[index] = categoria;
-    
+    ,).timeout(const Duration(milliseconds: 8000));
+  
     return categoria.id;
   }
 
@@ -143,16 +161,20 @@ class CategoryProvider with ChangeNotifier {
         'nombre': categoria.nombre,
         'descripcion': categoria.descripcion,
         'estado':  categoria.estado,
-        'imagen': categoria.imagen
+        'imagen': categoria.imagen,
+        'tags': categoria.tags
     };
     print(categoria.estado);
-    final url = Uri.parse( '${_baseURL}/api/categoria');
+    final url = Uri.parse( '$_baseURL/api/categoria');
     try {
+    final token = await storage.read(key: 'token') ?? '';
+    if(token ==''){ print('No hay token en el request: '); return null;}
+    print(token);
     final resp = await http.post(url,
     body: json.encode(categoryData),
     headers: {
       "Content-Type": "application/json", 
-      'x-token': await storage.read(key: 'token') ?? ''
+      'x-token': token
     }
     ).timeout(const Duration(seconds: 30));
     print(resp.body);  

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:poli_gestor_contenidos/models/models.dart';
 import 'package:poli_gestor_contenidos/providers/category_provider.dart';
 import 'package:poli_gestor_contenidos/providers/providers.dart';
+import 'package:poli_gestor_contenidos/providers/subcategory_provider.dart';
 import 'package:poli_gestor_contenidos/screens/screens.dart';
 import 'package:poli_gestor_contenidos/services/auth_services.dart';
 import 'package:poli_gestor_contenidos/share_preferences/preferences.dart';
@@ -17,6 +18,7 @@ class ListCategoriesScreen extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
+      final args = ModalRoute.of(context)?.settings.arguments ?? 'no data';
     final categoria = Provider.of<CategoryProvider>(context);
     final authService = Provider.of<AuthService>(context, listen: false);
     
@@ -43,7 +45,8 @@ class ListCategoriesScreen extends StatelessWidget {
           id: null,
           nombre: '',
           url: '',
-          tags: [],
+          tags: ['GENERAL'],
+          suscriptores: [],
           estado: 'PUBLICO',
           );
         Navigator.pushNamed(context, CategoryEditScreen.routerName);
@@ -161,12 +164,48 @@ class _ListCategories extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    final subcategoryProvider = Provider.of<SubcategoryProvider>(context, listen: false);
+    return 
+    categoryProvider.categorias.length >0 
+    ? _List(categoryProvider: categoryProvider, subcategoryProvider: subcategoryProvider)
+    : Container(
+      width: double.infinity,
+      // height: 500, 
+      // color: Colors.red,
+      child: Column(
+        children: [
+          Image(
+            image: AssetImage('assets/404.png'),
+            fit: BoxFit.cover,
+          ),
+          Text('No hay categorias sobre ${categoryProvider.selectedTag.toUpperCase()}', style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold), textAlign: TextAlign.center, )
+        ],
+      ),
+      );
+  }
+}
+
+class _List extends StatelessWidget {
+  const _List({
+    Key? key,
+    required this.categoryProvider,
+    required this.subcategoryProvider,
+  }) : super(key: key);
+
+  final CategoryProvider categoryProvider;
+  final SubcategoryProvider subcategoryProvider;
+
+  @override
+  Widget build(BuildContext context) {
     return Expanded(
       child: ListView.builder(
         itemCount: categoryProvider.categorias.length,
-        itemBuilder: (context, index) => GestureDetector(
-            onTap: () {
+        itemBuilder: (context, index) => 
+        GestureDetector(
+            onTap: () async{
               categoryProvider.selectedCategory = categoryProvider.categorias[index].copy();
+              subcategoryProvider.selectedSubcategory.idCategoria = categoryProvider.categorias[index].id!;
+              await subcategoryProvider.getSubcategorias();
               print(categoryProvider.selectedCategory.nombre);
               Navigator.pushNamed(context, CategoryDetailScreen.routerName);
             },
@@ -211,8 +250,8 @@ class _ListCategories extends StatelessWidget {
                           ),
                         ),
 
-                        // if(categoryProvider.categorias[index].tags.length != 0) 
-                        // TagsCategory(tag: categoryProvider.categorias[index].tags )
+                        if(categoryProvider.categorias[index].tags.length != 0) 
+                        TagsCategory(tag: categoryProvider.categorias[index].tags )
                       ],
 
                     ),
@@ -245,32 +284,34 @@ class _ListCategories extends StatelessWidget {
   }
 }
 
-// class TagsCategory extends StatelessWidget {
-//   const TagsCategory({
-//     Key? key,
-//     required this.tag,
-//   }) : super(key: key);
+class TagsCategory extends StatelessWidget {
+  const TagsCategory({
+    Key? key,
+    required this.tag,
+  }) : super(key: key);
 
-//   final List<String> tag;
+  final List<String> tag;
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       width: MediaQuery.of(context).size.width*0.68 ,
-//       child: Wrap(
-//         spacing: 6,
-//             children: [
-//               ...List.generate( tag.length, (i) => Chip(
-//                 padding: const EdgeInsets.all(1),
-//                 elevation: 2,
-//                 label: Text(tag[i], style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold),
-//                 ),
+  @override
+  Widget build(BuildContext context) {
+    final categoryProvider = Provider.of<CategoryProvider>(context);
+    return Container(
+      width: MediaQuery.of(context).size.width*0.68 ,
+      child: Wrap(
+        spacing: 6,
+            children: [
+              ...List.generate( tag.length, (i) => Chip(
+                backgroundColor: categoryProvider.colorByTagName(tag[i]),
+                padding: const EdgeInsets.all(1),
+                elevation: 2,
+                label: Text(tag[i], style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.white),
+                ),
                 
 
-//               ),)
-//             ],
-//           ),
-//     );
-//   }
-// }
+              ),)
+            ],
+          ),
+    );
+  }
+}
 

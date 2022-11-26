@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.poli_gestor_contenidos">
+    package="com.juandev.poli_gestor_contenidos">
    <application
         android:label="poli_gestor_contenidos"
         android:name="${applicationName}"

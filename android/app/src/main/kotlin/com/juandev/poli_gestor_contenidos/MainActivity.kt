@@ -1,4 +1,4 @@
-package com.example.poli_gestor_contenidos
+package com.juandev.poli_gestor_contenidos
 
 import io.flutter.embedding.android.FlutterActivity
 
