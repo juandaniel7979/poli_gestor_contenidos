@@ -5,11 +5,11 @@ class PublicationFormProvider extends ChangeNotifier {
 
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-  Publication publication;
+  Publicacion publication;
   
   PublicationFormProvider( this.publication);
 
-  updateAvailability(bool value ) {
+  updateAvailability(String value ) {
     print(value);
     publication.estado = value;
     notifyListeners();
@@ -17,7 +17,7 @@ class PublicationFormProvider extends ChangeNotifier {
 
   bool isValidForm() {
 
-    print(publication.description);
+    print(publication.descripcion);
     print(publication.id);
     print(publication.estado);
     

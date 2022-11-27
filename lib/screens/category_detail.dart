@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:poli_gestor_contenidos/models/subcategory.dart';
 import 'package:poli_gestor_contenidos/providers/category_provider.dart';
 import 'package:poli_gestor_contenidos/providers/subcategory_provider.dart';
+import 'package:poli_gestor_contenidos/screens/feedback_screen.dart';
 import 'package:poli_gestor_contenidos/screens/subcategory_edit_screen.dart';
 import 'package:poli_gestor_contenidos/share_preferences/preferences.dart';
 import 'package:poli_gestor_contenidos/themes/app_theme.dart';
@@ -146,34 +147,39 @@ class _SubcategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(4.0),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Preferences.isDarkMode ?Colors.black26 : Colors.white,
-          borderRadius: BorderRadius.circular(8)
-          
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                width: 330,
-                child: Row(
-                  children: [
-                    _SubcategoryImage(subcategoria: subcategoria, index: index),
-                    _SubcategoryLabels(subcategoria: subcategoria, index: index),
-
-                  ],
-                ),
-              ),
-              _SubcategoryIconMenu(subcategoria: subcategoria, index: index),
+    return GestureDetector(
+      onTap: (){
+        Navigator.pushNamed(context, FeedbackScreen.routerName);
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Preferences.isDarkMode ?Colors.black26 : Colors.white,
+            borderRadius: BorderRadius.circular(8)
             
-            ],
           ),
-        )),
+          child: Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  width: 330,
+                  child: Row(
+                    children: [
+                      _SubcategoryImage(subcategoria: subcategoria, index: index),
+                      _SubcategoryLabels(subcategoria: subcategoria, index: index),
+    
+                    ],
+                  ),
+                ),
+                _SubcategoryIconMenu(subcategoria: subcategoria, index: index),
+              
+              ],
+            ),
+          )),
+      ),
     );
   } 
 }

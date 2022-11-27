@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:poli_gestor_contenidos/forms/publication_form_provider.dart';
 import 'package:poli_gestor_contenidos/models/models.dart';
-import 'package:poli_gestor_contenidos/screens/archives_screen.dart';
+import 'package:poli_gestor_contenidos/providers/publication_provider.dart';
+import 'package:poli_gestor_contenidos/providers/subcategory_provider.dart';
 import 'package:poli_gestor_contenidos/screens/publication_edit_screen.dart';
 import 'package:poli_gestor_contenidos/screens/screens.dart';
 import 'package:poli_gestor_contenidos/services/auth_services.dart';
-import 'package:poli_gestor_contenidos/services/publications_services.dart';
-import 'package:poli_gestor_contenidos/themes/app_theme.dart';
 import 'package:poli_gestor_contenidos/widgets/widgets.dart';
 import 'package:provider/provider.dart';
 
@@ -15,19 +15,27 @@ class FeedbackScreen extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
-    final publicationService = Provider.of<PublicationsServices>(context);
+    final publicationProvider = Provider.of<PublicationProvider>(context);
+    final subcategoryProvider = Provider.of<SubcategoryProvider>(context);
     final authService = Provider.of<AuthService>(context, listen: false);
-    if( publicationService.isLoading ) return const LoadingScreen();
+
+
+    if( publicationProvider.isLoading ) return const LoadingScreen();
     return Scaffold(
       drawer: SideMenu(),
-      body: _ListPublications(publicationService: publicationService),
+      body: _ListPublications(publicationProvider: publicationProvider),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: (){
-          publicationService.selectedPublication = Publication(
-            description: '',
-            estado: true,
-            idUser: ''
+            // TODO: Añadir id de la subcategoria
+          publicationProvider.selectedPublicacion = Publicacion(
+            id: '',
+            idSubcategoria: subcategoryProvider.selectedSubcategory.id,
+            idProfesor: '',
+            nombre: '',
+            descripcion: '',
+            estado: 'PUBLICO',
+            imagenes: [],
             );
           Navigator.pushNamed(context, PublicationEditScreen.routerName);
         },
@@ -40,20 +48,19 @@ class FeedbackScreen extends StatelessWidget {
 class _ListPublications extends StatelessWidget {
   const _ListPublications({
     Key? key,
-    required this.publicationService,
+    required this.publicationProvider,
   }) : super(key: key);
 
-  final PublicationsServices publicationService;
+  final PublicationProvider publicationProvider;
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: publicationService.publications.length,
+      itemCount: publicationProvider.publicaciones.length,
       itemBuilder: ((context, index){
       var textStyle = const TextStyle( fontSize: 15, color: Colors.black);
-      final Size txtSize = _textSize(publicationService.publications[index].description, textStyle);
       // print(txtSize.height);
-      return Stack(
+      return Column(
         children: [
           SingleChildScrollView(
             child: Column(
@@ -66,32 +73,37 @@ class _ListPublications extends StatelessWidget {
                       children: [
                         CircleAvatar(
                       onBackgroundImageError: (exception, stackTrace) => Colors.white,
-                      backgroundImage: NetworkImage(publicationService.publications[index].picture ?? 'https://placeholder.com/300x300')),
+                      // backgroundImage: NetworkImage(publicationProvider.publications[index].picture ?? 'https://placeholder.com/300x300')),
+                      backgroundImage: NetworkImage('https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/one-piece-luffy-1589967502.jpg')),
                     const SizedBox( width: 10,),
                     Text('Juan Daniel Vargas Ramírez',textAlign: TextAlign.start, style: TextStyle( fontSize: 18,fontWeight: FontWeight.bold, color: Colors.black),),
                       ],
                     ),
                     IconButton(
                       icon: const Icon(Icons.settings, 
-                      color: Colors.white38
+                      color: Colors.red
                       ),
                       onPressed: () {},
                       ),
                   ],
                 ),
-                SingleChildScrollView(child: Padding(
-                  padding: const EdgeInsets.only(left: 30),
-                  child: Text(publicationService.publications[index].description, style: textStyle),
-                )),
+                Container(
+                  height: 150,
+                  child: SingleChildScrollView(
+                    child: Padding(
+                    padding: const EdgeInsets.only(left: 30),
+                    child: Text(publicationProvider.publicaciones[index].descripcion ?? 'Esta publicacion no cuenta con una descripcion', style: textStyle),
+                  )),
+                ),
               ],
             ),
           ),
           GestureDetector(
           onTap: () {
-            publicationService.selectedPublication = publicationService.publications[index].copy();
+            publicationProvider.selectedPublicacion = publicationProvider.publicaciones[index].copy();
             Navigator.pushNamed(context, PublicationEditScreen.routerName);
           },
-          child: PublicationCard(publication: publicationService.publications[index], size: txtSize)
+          child: PublicationCard(publication: publicationProvider.publicaciones[index])
           ),
         ],
         

@@ -2,13 +2,14 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:poli_gestor_contenidos/providers/category_provider.dart';
 import 'package:poli_gestor_contenidos/providers/providers.dart';
+import 'package:poli_gestor_contenidos/providers/publication_provider.dart';
 import 'package:poli_gestor_contenidos/providers/subcategory_provider.dart';
 import 'package:poli_gestor_contenidos/screens/feedback_screen.dart';
+import 'package:poli_gestor_contenidos/screens/profile_screen.dart';
 import 'package:poli_gestor_contenidos/screens/screens.dart';
 import 'package:poli_gestor_contenidos/screens/subcategory_edit_screen.dart';
 import 'package:poli_gestor_contenidos/services/auth_services.dart';
 import 'package:poli_gestor_contenidos/services/notifications_service.dart';
-import 'package:poli_gestor_contenidos/services/publications_services.dart';
 import 'package:poli_gestor_contenidos/services/push_notifications_service.dart';
 import 'package:poli_gestor_contenidos/share_preferences/preferences.dart';
 import 'package:provider/provider.dart';
@@ -23,7 +24,7 @@ void main() async{
       providers: [
         ChangeNotifierProvider( create: ( _ ) => AuthService()),
         ChangeNotifierProvider( create: ( _ ) => ThemeProvider(isDarkMode: Preferences.isDarkMode )),
-        ChangeNotifierProvider( create: ( _ ) => PublicationsServices()),
+        ChangeNotifierProvider( create: ( _ ) => PublicationProvider()),
         ChangeNotifierProvider( create: ( _ ) => CategoryProvider()),
         ChangeNotifierProvider( create: ( _ ) => SubcategoryProvider()),
         
@@ -51,7 +52,6 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     PushNotificationService.messagesStream.listen((message) {
       print('My app: ${message}');
-
       navigatorKey.currentState?.pushNamed(SettingsScreen.routerName, arguments: message);
       final snackBar = SnackBar(content: Text(message));
       messengerKey.currentState?.showSnackBar(snackBar);
@@ -68,7 +68,6 @@ class _MyAppState extends State<MyApp> {
       scaffoldMessengerKey: messengerKey, //Mostrar snapbar
       initialRoute: CheckAuthScreen.routerName,
       routes: {
-        CategoryScreen.routerName         : ( _ ) => const  CategoryScreen(),
         CategoryEditScreen.routerName     : ( _ ) => const CategoryEditScreen(),
         CategoryDetailScreen.routerName   : ( _ ) => const CategoryDetailScreen(),
         FeedbackScreen.routerName         : ( _ ) => const FeedbackScreen(),
@@ -77,6 +76,7 @@ class _MyAppState extends State<MyApp> {
         LoginScreen.routerName            : ( _ ) => const LoginScreen(),
         ListCategoriesScreen.routerName   : ( _ ) => const ListCategoriesScreen(),
         PublicationEditScreen.routerName  : ( _ ) => const PublicationEditScreen(),
+        ProfileScreen.routerName          : ( _ ) => const ProfileScreen(),
         RegisterScreen.routerName         : ( _ ) => const RegisterScreen(),
         SettingsScreen.routerName         : ( _ ) => const SettingsScreen(),
         SubcategoryEditScreen.routerName  : ( _ ) => const SubcategoryEditScreen(),

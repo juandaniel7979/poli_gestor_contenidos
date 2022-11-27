@@ -66,7 +66,7 @@ class Usuario {
     final String estado;
     final String uid;
 
-    get nombreCompleto => '$nombre ${nombre2 == null ? '' : nombre2} $apellido ${apellido2==null ? '' : apellido2}';
+    get nombreCompleto => '${nombre[0].toUpperCase() + nombre.substring(1)} ${nombre2 == null || nombre2 == '' ? '' : nombre2![0].toUpperCase() + nombre2!.substring(1)} ${apellido[0].toUpperCase() + apellido.substring(1)} ${apellido2!=null && apellido2!='' ? apellido2![0].toUpperCase()  + apellido2!.substring(1) : '' }';
 
 
     factory Usuario.fromJson(String str) => Usuario.fromMap(json.decode(str));

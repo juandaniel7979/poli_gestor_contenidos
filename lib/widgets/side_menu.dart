@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:poli_gestor_contenidos/screens/profile_screen.dart';
 import 'package:provider/provider.dart';
 
 import 'package:poli_gestor_contenidos/screens/list_categories_screen.dart';
@@ -26,10 +27,10 @@ class SideMenu extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: const Icon( Icons.people_alt_outlined,), 
-            title: const Text('People'),
+            leading: const Icon( Icons.person_outline,), 
+            title: const Text('Profile'),
             onTap: () {
-
+              Navigator.pushReplacementNamed(context, ProfileScreen.routerName);
             },
           ),
           ListTile(
@@ -40,7 +41,7 @@ class SideMenu extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: const Icon( Icons.settings_outlined,), 
+            leading: const Icon( Icons.logout,), 
             title: const Text('Logout'),
             onTap: () {
               authService.logout();

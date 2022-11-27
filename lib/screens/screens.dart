@@ -1,6 +1,5 @@
 export 'package:poli_gestor_contenidos/screens/category_detail.dart';
 export 'package:poli_gestor_contenidos/screens/category_edit_screen.dart';
-export 'package:poli_gestor_contenidos/screens/category_screen.dart';
 export 'package:poli_gestor_contenidos/screens/check_auth_screen.dart';
 export 'package:poli_gestor_contenidos/screens/home_screen.dart';
 export 'package:poli_gestor_contenidos/screens/list_categories_screen.dart';

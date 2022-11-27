@@ -4,24 +4,24 @@ import 'package:poli_gestor_contenidos/themes/app_theme.dart';
 
 class PublicationCard extends StatelessWidget {
 
-  final Publication publication;
-  final Size size;
+  final Publicacion publication;
 
-  const PublicationCard({super.key, required this.publication, required this.size});
+  const PublicationCard({super.key, required this.publication});
 
 
   
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only( bottom:20, top: size.width/8 <100 ? 80: size.width/5),
+      margin: EdgeInsets.only( bottom:20, top: 20),
       width: double.infinity,
       // height: 400,
       decoration: PublicationcardBorders(),
       child: Stack(
         alignment: Alignment.bottomLeft,
         children: [
-          _BackgroundImage( url: publication.picture,),
+          // _BackgroundImage( url: publication.picture,),
+          _BackgroundImage( url: 'https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/one-piece-luffy-1589967502.jpg',),
         ],
       ),
       );
