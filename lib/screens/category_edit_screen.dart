@@ -64,7 +64,6 @@ class _CategoryScreenBody extends StatelessWidget {
                         nombre: '',
                         url: '',
                         tags: [],
-                        suscriptores: [],
                         estado: 'PUBLICO',
                         );
                         Navigator.of(context).pop();

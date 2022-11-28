@@ -29,7 +29,7 @@ class RegisterScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       const SizedBox( height: 10,),
-                      Text('Crear cuenta', style: TextStyle(color: Preferences.isDarkMode ?  Colors.white : Colors.black, fontSize: 26, fontWeight: FontWeight.bold)),
+                      Text('Crear cuenta', style: TextStyle(color: Preferences.isDarkMode ?  Colors.white : Colors.black45, fontSize: 26, fontWeight: FontWeight.bold)),
                       const SizedBox( height:30,),   
                       ChangeNotifierProvider(
                         create:  ( _ ) => LoginFormProvider(),
@@ -45,7 +45,7 @@ class RegisterScreen extends StatelessWidget {
                     overlayColor: MaterialStateProperty.all(Colors.indigo.withOpacity(0.1)),
                     shape: MaterialStateProperty.all( const StadiumBorder())
                   ),
-                  child: Text('¿Ya tienes una cuenta?', style: TextStyle( fontSize: 18, color: Preferences.isDarkMode ? Colors.white : Colors.black87 ),)
+                  child: Text('¿Ya tienes una cuenta?', style: TextStyle( fontSize: 18, color: Preferences.isDarkMode ? Colors.white : Colors.black45 ),)
                 ),
                 const SizedBox( height: 50,)
                 

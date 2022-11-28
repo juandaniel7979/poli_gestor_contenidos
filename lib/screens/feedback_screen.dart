@@ -32,7 +32,6 @@ class FeedbackScreen extends StatelessWidget {
             id: '',
             idSubcategoria: subcategoryProvider.selectedSubcategory.id,
             idProfesor: '',
-            nombre: '',
             descripcion: '',
             estado: 'PUBLICO',
             imagenes: [],
@@ -92,7 +91,7 @@ class _ListPublications extends StatelessWidget {
                   child: SingleChildScrollView(
                     child: Padding(
                     padding: const EdgeInsets.only(left: 30),
-                    child: Text(publicationProvider.publicaciones[index].descripcion ?? 'Esta publicacion no cuenta con una descripcion', style: textStyle),
+                    child: Text(publicationProvider.publicaciones[index].descripcion , style: textStyle),
                   )),
                 ),
               ],

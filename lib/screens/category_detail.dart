@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:poli_gestor_contenidos/models/subcategory.dart';
 import 'package:poli_gestor_contenidos/providers/category_provider.dart';
+import 'package:poli_gestor_contenidos/providers/publication_provider.dart';
 import 'package:poli_gestor_contenidos/providers/subcategory_provider.dart';
 import 'package:poli_gestor_contenidos/screens/feedback_screen.dart';
 import 'package:poli_gestor_contenidos/screens/subcategory_edit_screen.dart';
@@ -72,9 +73,10 @@ class CategoryDetailScreen extends StatelessWidget {
                     ]
                     ),
                   ),
-                categoria.selectedCategory.suscriptores.length >0
-                ? _ListSuscriptions(categoria: categoria)
-                : Container(
+                // categoria.selectedCategory.suscriptores.length >0
+                // ? _ListSuscriptions(categoria: categoria)
+                // : 
+                Container(
                   width: double.infinity,
                   height: 200,
                   // color: Colors.red,
@@ -147,9 +149,18 @@ class _SubcategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final publicationProvider = Provider.of<PublicationProvider>(context, listen: false);
     return GestureDetector(
       onTap: (){
+        if(publicationProvider.selectedPublicacion.idSubcategoria != subcategoria.subcategorias[index].id){
+        publicationProvider.selectedPublicacion.idSubcategoria = subcategoria.subcategorias[index].id;
+        publicationProvider.publicaciones = [];
+        publicationProvider.getPublicaciones();
         Navigator.pushNamed(context, FeedbackScreen.routerName);
+        }else{
+          Navigator.pushNamed(context, FeedbackScreen.routerName);
+
+        }
       },
       child: Padding(
         padding: const EdgeInsets.all(4.0),
@@ -299,7 +310,9 @@ class _ListSuscriptions extends StatelessWidget {
         color: Preferences.isDarkMode ?Colors.black26 : Colors.white,
       ),
       child: ListView.builder(
-        itemCount: categoria.selectedCategory.suscriptores.length,
+        // TODO
+        // itemCount: categoria.selectedCategory.suscriptores.length,
+        itemCount: 4,
         itemBuilder: (context, index) => _SuscriptionCard(categoria: categoria, index: index,),
         ),
     );
@@ -341,27 +354,30 @@ class _SuscriptionCard extends StatelessWidget {
                 height: 50,
               margin: const EdgeInsets.symmetric( horizontal: 5, vertical: 15),
               // TODO: Reemplazar imagenes
-              child: (categoria.selectedCategory.suscriptores[index].id != null) 
-              ? ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: const FadeInImage(
-                  fit: BoxFit.cover,
-                  placeholder: AssetImage('assets/no-image.png'),
-                  image: NetworkImage( 'https://i.pinimg.com/originals/92/33/38/923338a4952114e7a040b12d15be600f.jpg'),
-                ),
-              )
-              : const Image(image: AssetImage('assets/no-image.png'))
+              child: 
+              // (categoria.selectedCategory.suscriptores[index].id != null) 
+              // ? ClipRRect(
+              //   borderRadius: BorderRadius.circular(20),
+              //   child: const FadeInImage(
+              //     fit: BoxFit.cover,
+              //     placeholder: AssetImage('assets/no-image.png'),
+              //     image: NetworkImage( 'https://i.pinimg.com/originals/92/33/38/923338a4952114e7a040b12d15be600f.jpg'),
+              //   ),
+              // )
+              // : 
+              const Image(image: AssetImage('assets/no-image.png'))
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // todo
                   Container(
-                    child: Text('${categoria.selectedCategory.suscriptores[index].suscriptor.nombreCompleto} ',
-                      style: TextStyle(color: Preferences.isDarkMode ?Colors.white : Colors.black45, fontSize: 16, fontWeight: FontWeight.bold),),
+                    // child: Text('${categoria.selectedCategory.suscriptores[index].suscriptor.nombreCompleto} ',
+                    //   style: TextStyle(color: Preferences.isDarkMode ?Colors.white : Colors.black45, fontSize: 16, fontWeight: FontWeight.bold),),
                   ),
                   Container(
-                    child: Text('${categoria.selectedCategory.suscriptores[index].estado }',
-                      style: TextStyle(color: Preferences.isDarkMode ?Colors.white : Colors.black45, fontSize: 14), overflow: TextOverflow.ellipsis, softWrap: true, maxLines: 1,),
+                    // child: Text('${categoria.selectedCategory.suscriptores[index].estado }',
+                    //   style: TextStyle(color: Preferences.isDarkMode ?Colors.white : Colors.black45, fontSize: 14), overflow: TextOverflow.ellipsis, softWrap: true, maxLines: 1,),
                   )
                 ],
               ),

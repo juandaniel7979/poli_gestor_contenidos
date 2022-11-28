@@ -30,8 +30,7 @@ class Publicacion {
         required this.id,
         required this.idSubcategoria,
         required this.idProfesor,
-        required this.nombre,
-        this.descripcion,
+        required this.descripcion,
         required this.imagenes,
         required this.estado,
     });
@@ -39,8 +38,7 @@ class Publicacion {
     String id;
     String idSubcategoria;
     String idProfesor;
-    String nombre;
-    String? descripcion;
+    String descripcion;
     final List<String> imagenes;
     String estado;
 
@@ -52,7 +50,6 @@ class Publicacion {
         id: json["_id"],
         idSubcategoria: json["id_subcategoria"],
         idProfesor: json["id_profesor"],
-        nombre: json["nombre"],
         descripcion: json["descripcion"],
         imagenes: List<String>.from(json["imagenes"].map((x) => x)),
         estado: json["estado"],
@@ -62,7 +59,6 @@ class Publicacion {
         "_id": id,
         "id_subcategoria": idSubcategoria,
         "id_profesor": idProfesor,
-        "nombre": nombre,
         "descripcion": descripcion,
         "imagenes": List<dynamic>.from(imagenes.map((x) => x)),
         "estado": estado,
@@ -75,7 +71,6 @@ class Publicacion {
           idProfesor: idProfesor,
           descripcion: descripcion,
           estado: estado, 
-          nombre: nombre,
           imagenes: imagenes,
         );
 }

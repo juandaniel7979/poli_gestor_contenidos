@@ -46,7 +46,6 @@ class ListCategoriesScreen extends StatelessWidget {
           nombre: '',
           url: '',
           tags: ['GENERAL'],
-          suscriptores: [],
           estado: 'PUBLICO',
           );
         Navigator.pushNamed(context, CategoryEditScreen.routerName);
@@ -227,7 +226,7 @@ class _List extends StatelessWidget {
               width: double.infinity,
               child: Row(
                 children: [
-                  CircleAvatar(radius: 35.0, backgroundImage: NetworkImage(categoryProvider.categorias[index].imagen != null && categoryProvider.categorias[index].imagen != '' ?  categoryProvider.categorias[index].imagen!  : 'https://www.ocu.org/-/media/ocu/images/home/alimentacion/alimentos/panes/panes-guia-compra.jpg' ),),
+                  CircleAvatar(radius: 35.0, backgroundImage: NetworkImage(categoryProvider.categorias[index].imagen != null && categoryProvider.categorias[index].imagen != '' ?  categoryProvider.categorias[index].imagen!  : 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/681px-Placeholder_view_vector.svg.png'),),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [

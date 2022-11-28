@@ -63,7 +63,6 @@ class _PublicationScreenBody extends StatelessWidget {
                                   id: '',
                                   idSubcategoria: '',
                                   idProfesor: '',
-                                  nombre: '',
                                   descripcion: '',
                                   estado: 'PUBLICO',
                                   imagenes: [],

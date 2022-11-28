@@ -39,7 +39,6 @@ class Categoria {
         required this.descripcion,
         required this.tags,
         this.url,
-        required this.suscriptores,
         required this.estado
     });
 
@@ -50,7 +49,6 @@ class Categoria {
     String descripcion;
     List<String> tags;
     String? url;
-    List<Suscriptores> suscriptores;
     String estado;
 
 
@@ -75,7 +73,6 @@ class Categoria {
         descripcion: json["descripcion"],
         tags: List<String>.from(json["tags"].map((x) => x)),
         url: json["url"],
-        suscriptores: List<Suscriptores>.from(json["suscriptores"].map((x) => Suscriptores.fromMap(x))),
         estado: json["estado"],
     );
 
@@ -98,7 +95,6 @@ class Categoria {
           nombre: nombre,
           tags: tags,
           imagen: imagen,
-          suscriptores: suscriptores,
           url: url,
         );
 }
@@ -120,7 +116,7 @@ class Suscriptores {
     String toJson() => json.encode(toMap());
 
     factory Suscriptores.fromMap(Map<String, dynamic> json) => Suscriptores(
-        suscriptor: Suscriptor.fromMap(json["suscriptor"]),
+        suscriptor: json["suscriptor"],
         estado: json["estado"],
         id: json["_id"],
     );

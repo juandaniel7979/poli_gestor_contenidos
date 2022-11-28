@@ -12,7 +12,6 @@ class PublicationProvider with ChangeNotifier {
   final _baseURL = 'http://192.168.56.1:3001';
   List <Publicacion> publicaciones = [];
   Publicacion selectedPublicacion = Publicacion(
-    nombre: '',
     estado: '',
     id: '',
     idSubcategoria: '',
@@ -86,7 +85,6 @@ class PublicationProvider with ChangeNotifier {
 
   Future updatePublicacion( Publicacion publicacion ) async {
     final Map<String,dynamic> subcategoryData = {
-        'nombre': publicacion.nombre,
         'descripcion': publicacion.descripcion,
         'estado':  publicacion.estado,
         'imagenes': publicacion.imagenes
@@ -114,7 +112,6 @@ class PublicationProvider with ChangeNotifier {
 
   Future createPublicacion( Publicacion publicacion ) async {
     final Map<String,dynamic> subcategoryData = {
-        'nombre': publicacion.nombre,
         'descripcion': publicacion.descripcion,
     };
     print(publicacion.idSubcategoria);
