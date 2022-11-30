@@ -3,6 +3,7 @@ import 'package:poli_gestor_contenidos/models/models.dart';
 import 'package:poli_gestor_contenidos/providers/category_provider.dart';
 import 'package:poli_gestor_contenidos/providers/providers.dart';
 import 'package:poli_gestor_contenidos/providers/subcategory_provider.dart';
+import 'package:poli_gestor_contenidos/providers/suscripcion_provider.dart';
 import 'package:poli_gestor_contenidos/screens/screens.dart';
 import 'package:poli_gestor_contenidos/services/auth_services.dart';
 import 'package:poli_gestor_contenidos/share_preferences/preferences.dart';
@@ -20,8 +21,16 @@ class ListCategoriesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
       final args = ModalRoute.of(context)?.settings.arguments ?? 'no data';
     final categoria = Provider.of<CategoryProvider>(context);
-    final authService = Provider.of<AuthService>(context, listen: false);
+    final usuario = Provider.of<AuthService>(context);
     
+
+    // if(usuario.usuario==null){
+    //   usuario = auth
+    //   usuario.logout();
+    //     Navigator.push(context, MaterialPageRoute(
+    //       builder: (context) => const LoginScreen())
+    //       );
+    // }
     if( categoria.isLoading ) return const LoadingScreen();
     return Scaffold(
       appBar: AppBar(
@@ -37,7 +46,12 @@ class ListCategoriesScreen extends StatelessWidget {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      
+      floatingActionButton: 
+      // usuario.usuario.rol == "ESTUDIANTE"
+      // ? null
+      // :
+      FloatingActionButton(
       onPressed: (){
         categoria.selectedCategory = Categoria(
           descripcion: '',
@@ -159,14 +173,17 @@ class _ListCategories extends StatelessWidget {
   }) : super(key: key);
 
   final CategoryProvider categoryProvider;
+  
 
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
     final subcategoryProvider = Provider.of<SubcategoryProvider>(context, listen: false);
-    return 
+    final suscripcionProvider = Provider.of<SuscripcionProvider>(context, listen: false);
+    
+    return
     categoryProvider.categorias.length >0 
-    ? _List(categoryProvider: categoryProvider, subcategoryProvider: subcategoryProvider)
+    ? _List(categoryProvider: categoryProvider, subcategoryProvider: subcategoryProvider, suscripcionProvider: suscripcionProvider,)
     : Container(
       width: double.infinity,
       // height: 500, 
@@ -189,13 +206,18 @@ class _List extends StatelessWidget {
     Key? key,
     required this.categoryProvider,
     required this.subcategoryProvider,
+    required this.suscripcionProvider,
   }) : super(key: key);
 
   final CategoryProvider categoryProvider;
   final SubcategoryProvider subcategoryProvider;
+  final SuscripcionProvider suscripcionProvider;
 
   @override
   Widget build(BuildContext context) {
+
+    final authService = Provider.of<AuthService>(context, listen: false);
+
     return Expanded(
       child: ListView.builder(
         itemCount: categoryProvider.categorias.length,
@@ -204,6 +226,9 @@ class _List extends StatelessWidget {
             onTap: () async{
               categoryProvider.selectedCategory = categoryProvider.categorias[index].copy();
               subcategoryProvider.selectedSubcategory.idCategoria = categoryProvider.categorias[index].id!;
+
+              await suscripcionProvider.getSuscripcionesPorCategoria(subcategoryProvider.selectedSubcategory.idCategoria);
+              print(suscripcionProvider.suscripcions);
               await subcategoryProvider.getSubcategorias();
               print(categoryProvider.selectedCategory.nombre);
               Navigator.pushNamed(context, CategoryDetailScreen.routerName);
@@ -254,26 +279,34 @@ class _List extends StatelessWidget {
                       ],
 
                     ),
-                    Padding(
+                    authService.usuario.uid == categoryProvider.categorias[index].idProfesor 
+                    ? Container(
                       padding: EdgeInsets.only(left: MediaQuery.of(context).size.width*0.01,),
                       child: PopupMenuButton<int>(
-                        onSelected: (item) {
-                          switch (item) {
-                            case 0:
-                              categoryProvider.selectedCategory = categoryProvider.categorias[index].copy();
-                              Navigator.pushNamed(context, CategoryEditScreen.routerName);
-                              break;
-                            case 1:
-                              // TODO: ELIMINAR
-                              break;
-                          }
-                        },
-                        itemBuilder: (context) => [
-                          const PopupMenuItem<int>(value: 0, child: Text('Editar')),
-                          const PopupMenuItem<int>(value: 1, child: Text('Eliminar')),
-                        ],
-                      ),
+                            onSelected: (item) {
+                              switch (item) {
+                                case 0:
+                                  categoryProvider.selectedCategory = categoryProvider.categorias[index].copy();
+                                  Navigator.pushNamed(context, CategoryEditScreen.routerName);
+                                  break;
+                                case 1:
+                                  // TODO: ELIMINAR
+                                  break;
+                              }
+                            },
+                            itemBuilder: (context) => [
+                              const PopupMenuItem<int>(value: 0, child: Text('Editar')),
+                              const PopupMenuItem<int>(value: 1, child: Text('Eliminar')),
+                            ],
+                          ),
+                    )
+                    : 
+                    Container(
+                      padding: EdgeInsets.only(left: MediaQuery.of(context).size.width*0.01,),
+                      child: IconButton(icon: const Icon(Icons.add, size: 28, color: AppTheme.primary,), onPressed: (){},),
                     ),
+
+                    Container()
                 ],
                 )
             ),
@@ -300,14 +333,13 @@ class TagsCategory extends StatelessWidget {
         spacing: 6,
             children: [
               ...List.generate( tag.length, (i) => Chip(
-                backgroundColor: categoryProvider.colorByTagName(tag[i]),
-                padding: const EdgeInsets.all(1),
-                elevation: 2,
-                label: Text(tag[i], style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.white),
+                  backgroundColor: categoryProvider.colorByTagName(tag[i]),
+                  padding: const EdgeInsets.all(1),
+                  elevation: 2,
+                  label: Text(tag[i], style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.white),
+                  ),
                 ),
-                
-
-              ),)
+              )
             ],
           ),
     );

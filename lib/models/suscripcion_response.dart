@@ -109,30 +109,29 @@ class User {
     User({
       required this.nit,
       required this.nombre,
-      required this.nombre2,
+      this.nombre2,
       required this.apellido,
-      required this.apellido2,
+      this.apellido2,
       required this.correo,
-      required this.contrasena,
-      required this.imagen,
+      this.imagen,
       required this.rol,
       required this.estado,
-      required this.siguiendo,
       required this.uid,
     });
 
     final String nit;
     final String nombre;
-    final String nombre2;
+    String? nombre2;
     final String apellido;
-    final String apellido2;
+    String? apellido2;
     final String correo;
-    final String contrasena;
-    final String imagen;
+    String? imagen;
     final String rol;
     final String estado;
-    final List<dynamic> siguiendo;
     final String uid;
+
+    get nombreCompleto => '${nombre[0].toUpperCase() + nombre.substring(1)} ${nombre2 == null || nombre2 == '' ? '' : nombre2![0].toUpperCase() + nombre2!.substring(1)} ${apellido[0].toUpperCase() + apellido.substring(1)} ${apellido2!=null && apellido2!='' ? apellido2![0].toUpperCase()  + apellido2!.substring(1) : '' }';
+
 
     factory User.fromJson(String str) => User.fromMap(json.decode(str));
 
@@ -145,11 +144,9 @@ class User {
         apellido: json["apellido"],
         apellido2: json["apellido_2"],
         correo: json["correo"],
-        contrasena: json["contrasena"],
         imagen: json["imagen"],
         rol: json["rol"],
         estado: json["estado"],
-        siguiendo: List<dynamic>.from(json["siguiendo"].map((x) => x)),
         uid: json["uid"],
     );
 
@@ -160,11 +157,9 @@ class User {
         "apellido": apellido,
         "apellido_2": apellido2,
         "correo": correo,
-        "contrasena": contrasena,
         "imagen": imagen,
         "rol": rol,
         "estado": estado,
-        "siguiendo": List<dynamic>.from(siguiendo.map((x) => x)),
         "uid": uid,
     };
 }

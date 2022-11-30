@@ -14,6 +14,7 @@ class AuthService extends ChangeNotifier{
   final storage = const FlutterSecureStorage();
 
   late Usuario usuario; 
+
   // Si retornamos algo es un error, sino todo bien
   Future<String?> createUser(String uid, String correo, String contrasena, String nombre, String nombre2, String apellido, String apellido2, String rol) async {
 
@@ -70,8 +71,8 @@ class AuthService extends ChangeNotifier{
       print(usuario.nombreCompleto);
       return null;
     }else{ 
-      print(decodedResp['errors'][0]);
-      return decodedResp['errors'][0]; }
+      print(decodedResp['msg']);
+      return decodedResp['msg']; }
   }
 
   Future logout() async {

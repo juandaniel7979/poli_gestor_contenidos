@@ -284,8 +284,8 @@ class _FormRegister extends StatelessWidget {
                 Navigator.pushReplacementNamed(context, LoginScreen.routerName);
       
               }else{
+                NotificationsService.showSnackbar("se presentó un problema al registrar");
                 loginForm.isLoading = false;
-                
               }
           },
             child: Container(

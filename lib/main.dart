@@ -1,9 +1,6 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:poli_gestor_contenidos/providers/category_provider.dart';
 import 'package:poli_gestor_contenidos/providers/providers.dart';
-import 'package:poli_gestor_contenidos/providers/publication_provider.dart';
-import 'package:poli_gestor_contenidos/providers/subcategory_provider.dart';
 import 'package:poli_gestor_contenidos/screens/feedback_screen.dart';
 import 'package:poli_gestor_contenidos/screens/profile_screen.dart';
 import 'package:poli_gestor_contenidos/screens/screens.dart';
@@ -27,6 +24,7 @@ void main() async{
         ChangeNotifierProvider( create: ( _ ) => PublicationProvider()),
         ChangeNotifierProvider( create: ( _ ) => CategoryProvider()),
         ChangeNotifierProvider( create: ( _ ) => SubcategoryProvider()),
+        ChangeNotifierProvider( create: ( _ ) => SuscripcionProvider()),
         
         
       ],
@@ -45,7 +43,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-  final GlobalKey<ScaffoldMessengerState> messengerKey = GlobalKey<ScaffoldMessengerState>();
+  // final GlobalKey<ScaffoldMessengerState> messengerKey = GlobalKey<ScaffoldMessengerState>();
   
   @override
   void initState() {
@@ -54,7 +52,7 @@ class _MyAppState extends State<MyApp> {
       print('My app: ${message}');
       navigatorKey.currentState?.pushNamed(SettingsScreen.routerName, arguments: message);
       final snackBar = SnackBar(content: Text(message));
-      messengerKey.currentState?.showSnackBar(snackBar);
+      NotificationsService.messengerKey.currentState?.showSnackBar(snackBar);
 
     });
   }
@@ -65,7 +63,7 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       title: 'Material  App',
       navigatorKey: navigatorKey, //Navegar
-      scaffoldMessengerKey: messengerKey, //Mostrar snapbar
+      scaffoldMessengerKey: NotificationsService.messengerKey, //Mostrar snapbar
       initialRoute: CheckAuthScreen.routerName,
       routes: {
         CategoryEditScreen.routerName     : ( _ ) => const CategoryEditScreen(),

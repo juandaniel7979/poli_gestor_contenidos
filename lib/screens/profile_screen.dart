@@ -31,7 +31,7 @@ class ProfileScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
                 Container(
-                  margin: EdgeInsets.only(top: 20, bottom: 10),
+                  margin: const EdgeInsets.only(top: 20, bottom: 10),
                   child: Center(
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(140.0),

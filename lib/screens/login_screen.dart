@@ -64,7 +64,7 @@ class _LoginForm extends StatelessWidget {
   Widget build(BuildContext context) {
   final loginForm = Provider.of<LoginFormProvider>(context);
   final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-  
+  final GlobalKey<ScaffoldMessengerState> messengerKey = GlobalKey<ScaffoldMessengerState>();
     return Container(
       child: Form(
         key: loginForm.formKey,
@@ -132,10 +132,8 @@ class _LoginForm extends StatelessWidget {
                   Navigator.pushReplacementNamed(context, ListCategoriesScreen.routerName);
 
                 }else{
-                  // TODO:mostrar error en pantalla
-                  print(errorMessage);
                   NotificationsService.showSnackbar(errorMessage);
-                  // loginForm.isLoading = false;
+                  loginForm.isLoading = false;
                 }
             },
               child: Container(

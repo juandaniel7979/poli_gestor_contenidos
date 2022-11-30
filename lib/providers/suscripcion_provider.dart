@@ -10,7 +10,7 @@ import 'package:poli_gestor_contenidos/models/tags_model.dart';
 
 // TODO: Corregir url con ip local
 
-class SubcategoryProvider with ChangeNotifier {
+class SuscripcionProvider with ChangeNotifier {
 
 // final _APIKEY = 'eae7a8c6d2f840d1a2595dafe0a195df';
   final _baseURL = 'http://192.168.56.1:3001';
@@ -29,17 +29,25 @@ class SubcategoryProvider with ChangeNotifier {
 
   Map<String,List<Suscripcion>> categoriesByTag = {};
   
-  SubcategoryProvider() {} 
+  SuscripcionProvider() {} 
 
   
   bool get isLoading => _isLoading;
 
-  getSuscripcionesPorId(String id) async {
+  getSuscripcionesPorCategoria(String id) async {
     _isLoading = true;
     notifyListeners();
     final url = '$_baseURL/api/suscripcion/categoria/${id}';
     print(url);
-    final resp = await http.get(Uri.parse(url));
+
+    final token = await storage.read(key: 'token') ?? '';
+    if(token ==''){ print('No hay token en el request: '); return null;}
+
+    final resp = await http.get(Uri.parse(url),
+    headers: {
+      "Content-Type": "application/json", 
+      'x-token': token
+    });
     print(resp.body);
     final subcategoryResponse = Suscripciones.fromJson( resp.body );
     suscripcions.addAll( subcategoryResponse.suscripciones);
@@ -53,6 +61,30 @@ class SubcategoryProvider with ChangeNotifier {
   Future aprobarSuscripcion( String id, String id_categoria) async {
     final Map<String,dynamic> subcategoryData = {
         'estado': "APROBADO",
+        'id_usuario': id
+    };
+    
+    final token = await storage.read(key: 'token') ?? '';
+    if(token ==''){ print('No hay token en el request: '); return null;}
+
+    print('id categoria: ${id}');
+    final url = Uri.parse('$_baseURL/api/suscripcion/${id_categoria}');
+    print('APROBAR');
+    final resp = await http.put(url, body: json.encode(subcategoryData),
+    headers: {
+    "Content-Type": "application/json", 
+    'x-token': token
+    }
+    ,).timeout(const Duration(milliseconds: 8000));
+    print(resp.body);
+
+    return null;
+  }
+
+
+  Future rechazarSuscripcion( String id, String id_categoria) async {
+    final Map<String,dynamic> subcategoryData = {
+        'estado': "RECHAZADO",
         'id_usuario': id
     };
     

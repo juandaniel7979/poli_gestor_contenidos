@@ -21,32 +21,47 @@ class SideMenu extends StatelessWidget {
 
           ListTile(
             leading: const Icon( Icons.pages_outlined,), 
-            title: const Text('Home'),
+            title: const Text('Inicio'),
             onTap: () {
               Navigator.pushReplacementNamed(context, ListCategoriesScreen.routerName);
             },
           ),
           ListTile(
             leading: const Icon( Icons.person_outline,), 
-            title: const Text('Profile'),
+            title: const Text('Perfil'),
+            onTap: () {
+              Navigator.pushReplacementNamed(context, ProfileScreen.routerName);
+            },
+          ),
+          authService.usuario.rol == "ESTUDIANTE"
+          ? ListTile(
+            leading: const Icon( Icons.category_outlined), 
+            title: const Text('Suscripciones'),
+            onTap: () {
+              Navigator.pushReplacementNamed(context, ProfileScreen.routerName);
+            },
+          )
+          : ListTile(
+            leading: const Icon( Icons.category_outlined), 
+            title: const Text('Mis categorias'),
             onTap: () {
               Navigator.pushReplacementNamed(context, ProfileScreen.routerName);
             },
           ),
           ListTile(
             leading: const Icon( Icons.settings_outlined,), 
-            title: const Text('Settings'),
+            title: const Text('Configuración'),
             onTap: () {
               Navigator.pushReplacementNamed(context, SettingsScreen.routerName);
             },
           ),
           ListTile(
             leading: const Icon( Icons.logout,), 
-            title: const Text('Logout'),
+            title: const Text('Cerrar sesión'),
             onTap: () {
               authService.logout();
-              Navigator.push(context, new MaterialPageRoute(
-                builder: (context) => LoginScreen())
+              Navigator.push(context, MaterialPageRoute(
+                builder: (context) => const LoginScreen())
                 );
             },
           ),

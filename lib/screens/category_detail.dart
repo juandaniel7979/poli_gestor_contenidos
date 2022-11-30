@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:poli_gestor_contenidos/models/subcategory.dart';
+import 'package:poli_gestor_contenidos/models/suscripcion_response.dart';
 import 'package:poli_gestor_contenidos/providers/category_provider.dart';
+import 'package:poli_gestor_contenidos/providers/providers.dart';
 import 'package:poli_gestor_contenidos/providers/publication_provider.dart';
 import 'package:poli_gestor_contenidos/providers/subcategory_provider.dart';
 import 'package:poli_gestor_contenidos/screens/feedback_screen.dart';
+import 'package:poli_gestor_contenidos/screens/list_categories_screen.dart';
 import 'package:poli_gestor_contenidos/screens/subcategory_edit_screen.dart';
 import 'package:poli_gestor_contenidos/share_preferences/preferences.dart';
 import 'package:poli_gestor_contenidos/themes/app_theme.dart';
@@ -19,6 +22,7 @@ class CategoryDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final categoria = Provider.of<CategoryProvider>(context);
     final subcategoria = Provider.of<SubcategoryProvider>(context);
+    final suscripcion = Provider.of<SuscripcionProvider>(context);
 
     return DefaultTabController(
       length: 2,
@@ -28,8 +32,9 @@ class CategoryDetailScreen extends StatelessWidget {
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_ios),
             onPressed: (){
+              suscripcion.suscripcions = [];
               subcategoria.subcategorias = [];
-              Navigator.pop(context);
+              Navigator.pushReplacementNamed(context, ListCategoriesScreen.routerName);
             },
           ),
           title: Text('Categoria: ${categoria.selectedCategory.nombre}'),
@@ -73,9 +78,9 @@ class CategoryDetailScreen extends StatelessWidget {
                     ]
                     ),
                   ),
-                // categoria.selectedCategory.suscriptores.length >0
-                // ? _ListSuscriptions(categoria: categoria)
-                // : 
+                suscripcion.suscripcions.length >0
+                ? _ListSuscriptions(suscripciones: suscripcion.suscripcions)
+                : 
                 Container(
                   width: double.infinity,
                   height: 200,
@@ -299,8 +304,8 @@ class _SubcategoryImage extends StatelessWidget {
 
 
 class _ListSuscriptions extends StatelessWidget {
-    final CategoryProvider categoria;
-  const _ListSuscriptions({super.key, required this.categoria});
+    final List<Suscripcion> suscripciones;
+  const _ListSuscriptions({super.key, required this.suscripciones});
 
   @override
   Widget build(BuildContext context) {
@@ -311,9 +316,9 @@ class _ListSuscriptions extends StatelessWidget {
       ),
       child: ListView.builder(
         // TODO
-        // itemCount: categoria.selectedCategory.suscriptores.length,
-        itemCount: 4,
-        itemBuilder: (context, index) => _SuscriptionCard(categoria: categoria, index: index,),
+        // itemCount: 4,
+        itemCount: suscripciones.length,
+        itemBuilder: (context, index) => _SuscriptionCard(suscripcion: suscripciones[index], index: index,),
         ),
     );
   }
@@ -321,23 +326,23 @@ class _ListSuscriptions extends StatelessWidget {
 
 class _SuscriptionCard extends StatelessWidget {
   final int index;
-  final CategoryProvider categoria;
+  final Suscripcion suscripcion;
   const _SuscriptionCard({
     Key? key, 
     required this.index,
-    required this.categoria,
+    required this.suscripcion,
   }) : super(key: key);
 
 
   @override
   Widget build(BuildContext context) {
+    final suscripcionProvider = Provider.of<SuscripcionProvider>(context);
     return Padding(
       padding: const EdgeInsets.all(4.0),
       child: Container(
         decoration: BoxDecoration(
           color: Preferences.isDarkMode ?Colors.black26 : Colors.white,
           borderRadius: BorderRadius.circular(8)
-          
         ),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -355,16 +360,16 @@ class _SuscriptionCard extends StatelessWidget {
               margin: const EdgeInsets.symmetric( horizontal: 5, vertical: 15),
               // TODO: Reemplazar imagenes
               child: 
-              // (categoria.selectedCategory.suscriptores[index].id != null) 
-              // ? ClipRRect(
-              //   borderRadius: BorderRadius.circular(20),
-              //   child: const FadeInImage(
-              //     fit: BoxFit.cover,
-              //     placeholder: AssetImage('assets/no-image.png'),
-              //     image: NetworkImage( 'https://i.pinimg.com/originals/92/33/38/923338a4952114e7a040b12d15be600f.jpg'),
-              //   ),
-              // )
-              // : 
+              (suscripcion.id != null) 
+              ? ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: const FadeInImage(
+                  fit: BoxFit.cover,
+                  placeholder: AssetImage('assets/no-image.png'),
+                  image: NetworkImage( 'https://i.pinimg.com/originals/92/33/38/923338a4952114e7a040b12d15be600f.jpg'),
+                ),
+              )
+              : 
               const Image(image: AssetImage('assets/no-image.png'))
               ),
               Column(
@@ -372,12 +377,12 @@ class _SuscriptionCard extends StatelessWidget {
                 children: [
                   // todo
                   Container(
-                    // child: Text('${categoria.selectedCategory.suscriptores[index].suscriptor.nombreCompleto} ',
-                    //   style: TextStyle(color: Preferences.isDarkMode ?Colors.white : Colors.black45, fontSize: 16, fontWeight: FontWeight.bold),),
+                    child: Text('${suscripcion.usuario.nombreCompleto} ',
+                      style: TextStyle(color: Preferences.isDarkMode ?Colors.white : Colors.black45, fontSize: 16, fontWeight: FontWeight.bold),),
                   ),
                   Container(
-                    // child: Text('${categoria.selectedCategory.suscriptores[index].estado }',
-                    //   style: TextStyle(color: Preferences.isDarkMode ?Colors.white : Colors.black45, fontSize: 14), overflow: TextOverflow.ellipsis, softWrap: true, maxLines: 1,),
+                    child: Text(suscripcion.estado,
+                      style: TextStyle(color: Preferences.isDarkMode ?Colors.white : Colors.black45, fontSize: 14), overflow: TextOverflow.ellipsis, softWrap: true, maxLines: 1,),
                   )
                 ],
               ),
@@ -389,6 +394,7 @@ class _SuscriptionCard extends StatelessWidget {
                 child: IconButton(
                   onPressed: (){
                     // TODO: APROBAR USUARIO
+                    suscripcionProvider.aprobarSuscripcion(suscripcion.usuario.uid, suscripcion.categoria.id);
                   },
                   icon: const Icon(Icons.check, color: AppTheme.primary, size: 36,)
                   ),
@@ -398,6 +404,7 @@ class _SuscriptionCard extends StatelessWidget {
                 child: IconButton(
                   onPressed: (){
                     // TODO: RECHAZAR USUARIO
+                    suscripcionProvider.rechazarSuscripcion(suscripcion.usuario.uid, suscripcion.categoria.id);
                   },
                   icon: Icon(Icons.close, color: Colors.red, size: 36,)
                   ),

@@ -45,6 +45,9 @@ class _PublicationScreenBody extends StatelessWidget {
       length: 2,
       initialIndex: publicationProvider.selectedPublicacion.estado == 'PUBLICO' ? 0 : 1,
       child: Scaffold(
+        appBar: AppBar(
+          title: Text('Subcategoria : { Subcategoria}'),
+        ),
         body: SingleChildScrollView(
           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           child: Column(
