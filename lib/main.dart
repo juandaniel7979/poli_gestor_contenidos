@@ -8,6 +8,7 @@ import 'package:poli_gestor_contenidos/screens/subcategory_edit_screen.dart';
 import 'package:poli_gestor_contenidos/services/auth_services.dart';
 import 'package:poli_gestor_contenidos/services/notifications_service.dart';
 import 'package:poli_gestor_contenidos/services/push_notifications_service.dart';
+import 'package:poli_gestor_contenidos/services/search_service.dart';
 import 'package:poli_gestor_contenidos/share_preferences/preferences.dart';
 import 'package:provider/provider.dart';
 
@@ -25,6 +26,7 @@ void main() async{
         ChangeNotifierProvider( create: ( _ ) => CategoryProvider()),
         ChangeNotifierProvider( create: ( _ ) => SubcategoryProvider()),
         ChangeNotifierProvider( create: ( _ ) => SuscripcionProvider()),
+        ChangeNotifierProvider( create: ( _ ) => SearchService()),
         
         
       ],

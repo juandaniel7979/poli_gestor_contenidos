@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:poli_gestor_contenidos/models/users_stats.dart';
 import 'package:poli_gestor_contenidos/services/auth_services.dart';
 import 'package:poli_gestor_contenidos/share_preferences/preferences.dart';
@@ -23,25 +24,59 @@ class ProfileScreen extends StatelessWidget {
           backgroundColor: AppTheme.primary,
           title: Padding(
             padding: EdgeInsets.only(left: size.width*0.118),
-            child: Text('Perfil: ${usuario.usuario.nombreCompleto}'),
+              child: Text('${usuario.usuario.nombreCompleto}'),
           ), 
         ),
-        drawer: SideMenu(),
+        drawer: const SideMenu(),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
                 Container(
                   margin: const EdgeInsets.only(top: 20, bottom: 10),
                   child: Center(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(140.0),
-                        child: const FadeInImage(
-                          height: 250,
-                          width: 250,
-                          fit: BoxFit.cover,
-                          placeholder: AssetImage('assets/jar-loading.gif'),
-                          image: AssetImage('assets/no-image.png'),
+                    child: Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(140.0),
+                            child: FadeInImage(
+                              height: 250,
+                              width: 250,
+                              fit: BoxFit.cover,
+                              placeholder: const AssetImage('assets/jar-loading.gif'),
+                              image: NetworkImage(usuario.usuario.imagen ?? 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/681px-Placeholder_view_vector.svg.png'),
+                            ),
                         ),
+                        Positioned(
+                          top: 180,
+                          right: 40,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.black,
+                              borderRadius: BorderRadius.circular(100)
+                            ),
+                            child: IconButton(
+                              alignment: Alignment.center,
+                              onPressed: () async {
+                                
+                                final picker = ImagePicker();
+                                final XFile? pickedFile = await picker.pickImage(
+                                  source: ImageSource.camera,
+                                  // source: ImageSource.gallery,
+                                  imageQuality: 100
+                                  ); 
+                        
+                                  if( pickedFile == null) {
+                                    print('No seleccionó nada');
+                                    return;
+                                  }
+                                  print('Tenemos imagen ${ pickedFile.path}');
+                                  usuario.updateUserImage(pickedFile.path);
+                              },
+                              icon: const Icon( Icons.camera_alt_outlined, size: 40, color: Colors.red,),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -49,7 +84,7 @@ class ProfileScreen extends StatelessWidget {
             
               Container(
                 color: Preferences.isDarkMode ?Colors.black12 : Colors.black54,
-                child: TabBar(
+                child: const TabBar(
                 indicator: BoxDecoration(
                   color: AppTheme.primary,
                 ),

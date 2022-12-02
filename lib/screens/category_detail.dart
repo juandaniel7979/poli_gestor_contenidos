@@ -158,10 +158,11 @@ class _SubcategoryCard extends StatelessWidget {
     return GestureDetector(
       onTap: (){
         if(publicationProvider.selectedPublicacion.idSubcategoria != subcategoria.subcategorias[index].id){
-        publicationProvider.selectedPublicacion.idSubcategoria = subcategoria.subcategorias[index].id;
-        publicationProvider.publicaciones = [];
-        publicationProvider.getPublicaciones();
-        Navigator.pushNamed(context, FeedbackScreen.routerName);
+          subcategoria.selectedSubcategory = subcategoria.subcategorias[index].copy();
+          publicationProvider.selectedPublicacion.idSubcategoria = subcategoria.subcategorias[index].id;
+          publicationProvider.publicaciones = [];
+          publicationProvider.getPublicaciones();
+          Navigator.pushNamed(context, FeedbackScreen.routerName);
         }else{
           Navigator.pushNamed(context, FeedbackScreen.routerName);
 

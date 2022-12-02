@@ -113,6 +113,8 @@ class PublicationProvider with ChangeNotifier {
   Future createPublicacion( Publicacion publicacion ) async {
     final Map<String,dynamic> subcategoryData = {
         'descripcion': publicacion.descripcion,
+        'estado':  publicacion.estado,
+        'imagenes': publicacion.imagenes
     };
     print(publicacion.idSubcategoria);
     final url = Uri.parse( '$_baseURL/api/publicacion/${publicacion.idSubcategoria}');

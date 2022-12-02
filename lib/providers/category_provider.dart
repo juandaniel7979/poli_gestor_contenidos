@@ -183,6 +183,10 @@ class CategoryProvider with ChangeNotifier {
     final Map<String, dynamic> decodedResp = json.decode( resp.body);
 
     if( decodedResp.containsKey('id_profesor')) {
+      final index = categorias.indexWhere((element) => element.id == categoria.id);
+      categorias[index] = categoria;
+
+      notifyListeners();
       return null;
     }else{
       print(decodedResp['errors'][0]);

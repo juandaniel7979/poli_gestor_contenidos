@@ -108,6 +108,8 @@ class SuscripcionProvider with ChangeNotifier {
 
   Future createSuscripcion( String idCategoria ) async {
 
+    final token = await storage.read(key: 'token') ?? '';
+    if(token ==''){ print('No hay token en el request: '); return null;}
     final url = Uri.parse( '$_baseURL/api/suscripcion/$idCategoria');
     print('CREAR-----------------');
     print(url);
@@ -115,20 +117,18 @@ class SuscripcionProvider with ChangeNotifier {
     final resp = await http.post(url,
     headers: {
       "Content-Type": "application/json", 
-      'x-token': await storage.read(key: 'token') ?? ''
+      'x-token': token
     }
-    ).timeout(const Duration(seconds: 30));
+    );
     print(resp.body);  
     
     final Map<String, dynamic> decodedResp = json.decode( resp.body);
 
-    if( decodedResp.containsKey('_id')) {
-      print('resp.body');
-      print(resp.body);
+    if( decodedResp.containsKey('estado')) {
       return null;
     }else{
       print(decodedResp['errors']);
-      return 'error';
+      return decodedResp['errors'][0];
     }
       
     } catch (e) {

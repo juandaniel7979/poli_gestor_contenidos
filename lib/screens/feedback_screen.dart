@@ -6,6 +6,8 @@ import 'package:poli_gestor_contenidos/providers/subcategory_provider.dart';
 import 'package:poli_gestor_contenidos/screens/publication_edit_screen.dart';
 import 'package:poli_gestor_contenidos/screens/screens.dart';
 import 'package:poli_gestor_contenidos/services/auth_services.dart';
+import 'package:poli_gestor_contenidos/share_preferences/preferences.dart';
+import 'package:poli_gestor_contenidos/themes/app_theme.dart';
 import 'package:poli_gestor_contenidos/widgets/widgets.dart';
 import 'package:provider/provider.dart';
 
@@ -22,9 +24,29 @@ class FeedbackScreen extends StatelessWidget {
 
     if( publicationProvider.isLoading ) return const LoadingScreen();
     return Scaffold(
-      drawer: SideMenu(),
-      body: _ListPublications(publicationProvider: publicationProvider),
+      appBar: AppBar(
+        backgroundColor: AppTheme.primary,
+        title: Text(subcategoryProvider.selectedSubcategory.nombre),
+      ),
+      drawer: const SideMenu(),
+      body: 
+      publicationProvider.publicaciones.length < 1
+      ? Container(
+        width: double.infinity,
+        // color: Colors.red,
+        child: Column(
+          children: [
+            Image(
+              image: AssetImage('assets/404.png'), fit: BoxFit.cover,
+              height: 450,
+              ),
+            Text("No hay publicaciones aun", style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: Preferences.isDarkMode ? Colors.white :  Colors.black87), textAlign: TextAlign.center,)
+          ]
+          ),
+      )
+      : _ListPublications(publicationProvider: publicationProvider),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: AppTheme.secondary,
         child: const Icon(Icons.add),
         onPressed: (){
             // TODO: Añadir id de la subcategoria

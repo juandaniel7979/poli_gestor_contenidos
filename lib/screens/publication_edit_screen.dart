@@ -80,7 +80,6 @@ class _PublicationScreenBody extends StatelessWidget {
                     right: 20,
                     child: IconButton(
                       onPressed: () async {
-                        
                         final picker = ImagePicker();
                         final XFile? pickedFile = await picker.pickImage(
                           source: ImageSource.camera,
@@ -100,10 +99,8 @@ class _PublicationScreenBody extends StatelessWidget {
                   ),
                 ],
               ),
-              
               const SizedBox( height: 30,),
-    
-              const _CategoryForm(),
+              const _PublicationForm(),
             ],
           ),
         ),
@@ -118,8 +115,8 @@ class _PublicationScreenBody extends StatelessWidget {
               final String? imageUrl = await publicationProvider.uploadImage();
     
               if( imageUrl != null ) publicationForm.publication.imagenes.add(imageUrl);
-              // print(publicationForm.subcategoria.imagen);
-              // print(publicationForm.subcategoria.estado);
+              // print(publicationForm.publicacion.imagen);
+              // print(publicationForm.publicacion.estado);
               await publicationProvider.saveOrCreatePublicacion(publicationForm.publication);
     
           },
@@ -132,19 +129,19 @@ class _PublicationScreenBody extends StatelessWidget {
   }
 }
 
-class _CategoryForm extends StatelessWidget {
+class _PublicationForm extends StatelessWidget {
 
 
-  const _CategoryForm({
+  const _PublicationForm({
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
   
-  final publicationForm = Provider.of<SubcategoryFormProvider>(context);
+  final publicationForm = Provider.of<PublicationFormProvider>(context);
   final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-  final subcategoria = publicationForm.subcategoria;
+  final publicacion = publicationForm.publication;
   
     return Column(
       children: [
@@ -161,34 +158,18 @@ class _CategoryForm extends StatelessWidget {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    const SizedBox(height: 10),
-                    TextFormField(
-                      style: TextStyle(color: Preferences.isDarkMode ? Colors.white : Colors.black),
-                      initialValue: subcategoria.nombre,
-                      onChanged: (value) => subcategoria.nombre = value,
-                      validator: (value) {
-                        if( value == null || value.isEmpty){
-                          return 'El nombre es obligatorio';
-                        }
-                      },
-                      decoration: InputDecorations.authInputDecoration(
-                        hintText: 'Nombre de la subcategoria',
-                        label: 'Nombre:',
-                        color: Preferences.isDarkMode ? Colors.black45 : Colors.white
-                      ),
-                    ),
                     const SizedBox(height: 20),
                     TextFormField(
                       style: TextStyle(color: Preferences.isDarkMode ? Colors.white : Colors.black),
-                      initialValue: subcategoria.descripcion,
-                      onChanged: (value) => subcategoria.descripcion = value,
+                      initialValue: publicacion.descripcion,
+                      onChanged: (value) => publicacion.descripcion = value,
                       validator: (value) {
                         if( value == null || value.isEmpty){
                           return 'La descripcion es obligatorio';
                         }
                       },
                       decoration: InputDecorations.authInputDecoration(
-                        hintText: 'Descripcion de la subcategoria',
+                        hintText: 'Descripcion de la publicacion',
                         label: 'Descripcion:',
                         color: Preferences.isDarkMode ? Colors.black45 : Colors.white
                       ),
@@ -200,13 +181,13 @@ class _CategoryForm extends StatelessWidget {
                       onTap: (selectedRol) {
                       switch(selectedRol) {
                         case 0: {
-                          publicationForm.subcategoria.estado = "PUBLICO";
-                          print(publicationForm.subcategoria.estado);
+                          publicationForm.publication.estado = "PUBLICO";
+                          print(publicationForm.publication.estado);
                         }
                         break;
                         case 1: {
-                          publicationForm.subcategoria.estado = "PRIVADO";
-                          print(publicationForm.subcategoria.estado);
+                          publicationForm.publication.estado = "PRIVADO";
+                          print(publicationForm.publication.estado);
                         }
                         break;
 

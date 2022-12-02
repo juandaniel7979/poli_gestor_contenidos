@@ -105,8 +105,7 @@ class SubcategoryProvider with ChangeNotifier {
     final token = await storage.read(key: 'token') ?? '';
     if(token ==''){ print('No hay token en el request: '); return null;}
 
-    print('id categoria: ${subcategoria.idCategoria}');
-    final url = Uri.parse('$_baseURL/api/subcategoria/${subcategoria.idCategoria}');
+    final url = Uri.parse('$_baseURL/api/subcategoria/${subcategoria.id}');
     print('ACTUALIZAR-----------------');
     print(url);
     final resp = await http.put(url, body: json.encode(subcategoryData),
@@ -114,7 +113,11 @@ class SubcategoryProvider with ChangeNotifier {
     "Content-Type": "application/json", 
     'x-token': token
     }
-    ,).timeout(const Duration(milliseconds: 8000));
+    ,);
+    
+    final index = subcategorias.indexWhere((element) => element.id == subcategoria.id);
+    subcategorias[index] = subcategoria;
+    notifyListeners();
 
     final decodedData = resp.body;
     print(resp.body);

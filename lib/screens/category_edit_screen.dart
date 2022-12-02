@@ -131,20 +131,25 @@ class _CategoryFormState extends State<_CategoryForm> {
   final CategoryProvider categoryProvider = Provider.of<CategoryProvider>(context);
 
 
-  List<Tag> TagsImport = categoryProvider.copyTags;
+  List<String> tagsImport = [];
+  // categoryProvider.copyTags;
+  
 
-    @override
-      initState() {
-        for (var i = 0; i < TagsImport.length; i++) {
-          if(categoryProvider.selectedCategory.tags.contains(TagsImport[i].name)){
-            TagsImport[i].isSelected = true;
-          }
-        }
-        setState(() {
+    // @override
+    //   initState() {
+    //     super.initState();
+    //     for (var i = 0; i < tagsImport.length; i++) {
+    //       if(categoryProvider.selectedCategory.tags.contains(tagsImport[i].name)){
+    //         tagsImport[i].isSelected = true;
+    //         print('tagsImport[$i]');
+    //         print(tagsImport[i]);
+    //       }
+    //     }
+    //     setState(() {
           
-        });
+    //     });
 
-      }
+    //   }
 
     return Column(
       children: [
@@ -202,30 +207,30 @@ class _CategoryFormState extends State<_CategoryForm> {
                         spacing: 6,
                         children: <Widget>[
                           ...List.generate(
-                            TagsImport.length,
+                            tagsImport.length,
                             (i) => FilterChip(
-                              selected: TagsImport[i].isSelected,
+                              selected: tagsImport[i].isSelected,
                               onSelected: (bool selected) {
                                 setState(() {
-                                  TagsImport[i].isSelected = selected;
+                                  tagsImport[i].isSelected = selected;
 
-                                  print(TagsImport[i].name);
+                                  print(tagsImport[i].name);
                                   print(categoria.tags);
                                 });
-                                if (TagsImport[i].isSelected) {
+                                if (tagsImport[i].isSelected) {
                                   categoria.tags.removeWhere((String name) {
                                     return name == categoria.tags;
                                   });
                                 } else {
-                                  if(!categoria.tags.contains(TagsImport[i].name)){
-                                    categoria.tags.add(TagsImport[i].name);
+                                  if(!categoria.tags.contains(tagsImport[i].name)){
+                                    categoria.tags.add(tagsImport[i].name);
                                   }
                                 }
                               },
                             
                               labelStyle: const TextStyle(fontSize: 10),
-                              backgroundColor: TagsImport[i].color,
-                              label: Text(TagsImport[i].name)
+                              backgroundColor: tagsImport[i].color,
+                              label: Text(tagsImport[i].name)
                               ),
                           ),
                         ],
@@ -324,6 +329,7 @@ class _CategoryFormState extends State<_CategoryForm> {
 
 
 class _SelectImageIcon extends StatelessWidget {
+  
   const _SelectImageIcon({
     Key? key,
     required this.categoryProvider,
@@ -333,6 +339,10 @@ class _SelectImageIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    
+
+
+
     return Positioned(
       top: 60,
       right: 20,
@@ -340,6 +350,7 @@ class _SelectImageIcon extends StatelessWidget {
         onPressed: () async {
           
           final picker = ImagePicker();
+          
           final XFile? pickedFile = await picker.pickImage(
             source: ImageSource.camera,
             // source: ImageSource.gallery,
@@ -358,3 +369,4 @@ class _SelectImageIcon extends StatelessWidget {
     );
   }
 }
+

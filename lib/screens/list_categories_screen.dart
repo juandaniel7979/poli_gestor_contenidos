@@ -5,6 +5,7 @@ import 'package:poli_gestor_contenidos/providers/providers.dart';
 import 'package:poli_gestor_contenidos/providers/subcategory_provider.dart';
 import 'package:poli_gestor_contenidos/providers/suscripcion_provider.dart';
 import 'package:poli_gestor_contenidos/screens/screens.dart';
+import 'package:poli_gestor_contenidos/search/search_delegate.dart';
 import 'package:poli_gestor_contenidos/services/auth_services.dart';
 import 'package:poli_gestor_contenidos/share_preferences/preferences.dart';
 import 'package:poli_gestor_contenidos/themes/app_theme.dart';
@@ -24,18 +25,15 @@ class ListCategoriesScreen extends StatelessWidget {
     final usuario = Provider.of<AuthService>(context);
     
 
-    // if(usuario.usuario==null){
-    //   usuario = auth
-    //   usuario.logout();
-    //     Navigator.push(context, MaterialPageRoute(
-    //       builder: (context) => const LoginScreen())
-    //       );
-    // }
     if( categoria.isLoading ) return const LoadingScreen();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Lista de categorias'),
-        backgroundColor: AppTheme.primary
+        backgroundColor: AppTheme.primary,
+        actions: [
+          IconButton(onPressed: () =>showSearch(context: context, delegate: PoliSearchDelegate()) 
+            , icon: const Icon(Icons.search)),
+        ],
       ),
       drawer: const SideMenu(),
       body: SafeArea(
@@ -48,9 +46,9 @@ class ListCategoriesScreen extends StatelessWidget {
       ),
       
       floatingActionButton: 
-      // usuario.usuario.rol == "ESTUDIANTE"
-      // ? null
-      // :
+      usuario.usuario.rol == "ESTUDIANTE"
+      ? null
+      :
       FloatingActionButton(
       onPressed: (){
         categoria.selectedCategory = Categoria(
@@ -61,7 +59,8 @@ class ListCategoriesScreen extends StatelessWidget {
           url: '',
           tags: ['GENERAL'],
           estado: 'PUBLICO',
-          );
+        );
+
         Navigator.pushNamed(context, CategoryEditScreen.routerName);
       },
         backgroundColor: AppTheme.secondary,
@@ -221,12 +220,13 @@ class _List extends StatelessWidget {
     return Expanded(
       child: ListView.builder(
         itemCount: categoryProvider.categorias.length,
-        itemBuilder: (context, index) => 
-        GestureDetector(
+        itemBuilder: (context, index) {
+          var width2 = MediaQuery.of(context).size.width*0.68;
+          return GestureDetector(
             onTap: () async{
               categoryProvider.selectedCategory = categoryProvider.categorias[index].copy();
               subcategoryProvider.selectedSubcategory.idCategoria = categoryProvider.categorias[index].id!;
-
+              // TODO: Validar suscripcion del usuario antes de redireccionarlo
               await suscripcionProvider.getSuscripcionesPorCategoria(subcategoryProvider.selectedSubcategory.idCategoria);
               print(suscripcionProvider.suscripcions);
               await subcategoryProvider.getSubcategorias();
@@ -255,12 +255,15 @@ class _List extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.only( left: 10, bottom: 10),
-                          child: Text(categoryProvider.categorias[index].nombre, style: const TextStyle( fontSize: 14, fontWeight: FontWeight.bold),),
+                        Container(
+                          width: width2,
+                          child: Padding(
+                            padding: const EdgeInsets.only( left: 10, bottom: 10),
+                            child: Text(categoryProvider.categorias[index].nombre, style: const TextStyle( fontSize: 14, fontWeight: FontWeight.bold),),
+                          ),
                         ),
                         Container(
-                          width: MediaQuery.of(context).size.width*0.68,
+                          width: width2,
                           child: Padding(
                             padding: const EdgeInsets.only( left: 10),
                             child: Row(
@@ -303,14 +306,17 @@ class _List extends StatelessWidget {
                     : 
                     Container(
                       padding: EdgeInsets.only(left: MediaQuery.of(context).size.width*0.01,),
-                      child: IconButton(icon: const Icon(Icons.add, size: 28, color: AppTheme.primary,), onPressed: (){},),
+                      child: IconButton(icon: const Icon(Icons.add, size: 28, color: AppTheme.primary,), onPressed: ()async{
+                        await suscripcionProvider.createSuscripcion(categoryProvider.categorias[index].id!);
+                      },),
                     ),
 
                     Container()
                 ],
                 )
             ),
-          ),
+          );
+        },
         ),
     );
   }

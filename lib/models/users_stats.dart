@@ -46,7 +46,6 @@ class Usuario {
         this.apellido2,
         this.imagen,
         required this.correo,
-        required this.contrasena,
         required this.rol,
         required this.estado,
         required this.uid,
@@ -59,10 +58,9 @@ class Usuario {
     String? apellido2;
     String? imagen;
     final String correo;
-    final String contrasena;
     final String rol;
-    final String estado;
-    final String uid;
+    String estado;
+    String? uid;
 
     get nombreCompleto => '${nombre[0].toUpperCase() + nombre.substring(1)} ${nombre2 == null || nombre2 == '' ? '' : nombre2![0].toUpperCase() + nombre2!.substring(1)} ${apellido[0].toUpperCase() + apellido.substring(1)} ${apellido2!=null && apellido2!='' ? apellido2![0].toUpperCase()  + apellido2!.substring(1) : '' }';
 
@@ -78,7 +76,6 @@ class Usuario {
         apellido: json["apellido"],
         apellido2: json["apellido_2"]  == null ? null : json["apellido_2"],
         correo: json["correo"],
-        contrasena: json["contrasena"],
         imagen: json["imagen"]  == null ? null : json["imagen"],
         rol: json["rol"],
         estado: json["estado"],
@@ -92,7 +89,6 @@ class Usuario {
         "apellido": apellido,
         "apellido_2": apellido2 == null ? null : nombre2,
         "correo": correo,
-        "contrasena": contrasena,
         "rol": rol,
         "estado": estado,
         "uid": uid,

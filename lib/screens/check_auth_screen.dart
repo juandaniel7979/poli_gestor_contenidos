@@ -29,7 +29,6 @@ class CheckAuthScreen extends StatelessWidget {
               )
             );
             });
-
           }else{
             Future.microtask(() {
               Navigator.pushReplacement(context, PageRouteBuilder(
