@@ -64,7 +64,7 @@ class _LoginForm extends StatelessWidget {
   Widget build(BuildContext context) {
   final loginForm = Provider.of<LoginFormProvider>(context);
   final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-  final GlobalKey<ScaffoldMessengerState> messengerKey = GlobalKey<ScaffoldMessengerState>();
+  // final GlobalKey<ScaffoldMessengerState> messengerKey = GlobalKey<ScaffoldMessengerState>();
     return Container(
       child: Form(
         key: loginForm.formKey,

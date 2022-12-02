@@ -7,6 +7,7 @@ import 'package:poli_gestor_contenidos/providers/suscripcion_provider.dart';
 import 'package:poli_gestor_contenidos/screens/screens.dart';
 import 'package:poli_gestor_contenidos/search/search_delegate.dart';
 import 'package:poli_gestor_contenidos/services/auth_services.dart';
+import 'package:poli_gestor_contenidos/services/notifications_service.dart';
 import 'package:poli_gestor_contenidos/share_preferences/preferences.dart';
 import 'package:poli_gestor_contenidos/themes/app_theme.dart';
 import 'package:poli_gestor_contenidos/widgets/side_menu.dart';
@@ -226,12 +227,35 @@ class _List extends StatelessWidget {
             onTap: () async{
               categoryProvider.selectedCategory = categoryProvider.categorias[index].copy();
               subcategoryProvider.selectedSubcategory.idCategoria = categoryProvider.categorias[index].id!;
-              // TODO: Validar suscripcion del usuario antes de redireccionarlo
-              await suscripcionProvider.getSuscripcionesPorCategoria(subcategoryProvider.selectedSubcategory.idCategoria);
-              print(suscripcionProvider.suscripcions);
-              await subcategoryProvider.getSubcategorias();
-              print(categoryProvider.selectedCategory.nombre);
-              Navigator.pushNamed(context, CategoryDetailScreen.routerName);
+
+              if(authService.usuario.uid == categoryProvider.selectedCategory.idProfesor || authService.usuario.rol == "ADMINISTRADOR"){
+                await suscripcionProvider.getSuscripcionesPorCategoria(subcategoryProvider.selectedSubcategory.idCategoria);
+                subcategoryProvider.subcategorias = [];
+                await subcategoryProvider.getSubcategorias();
+                Navigator.pushNamed(context, CategoryDetailScreen.routerName);
+                print("el usuario es profesor de la categoria");
+                return;
+              }
+
+              if(authService.suscripciones.length>0 && authService.suscripciones.contains((element) => element.categoria.id == categoryProvider.selectedCategory.id)){
+                final i = authService.suscripciones.indexWhere((element) => element.categoria.id == categoryProvider.selectedCategory.id);
+
+                // Validar suscripcion del usuario antes de redireccionarlo
+                
+                if(authService.suscripciones[i].estado == "APROBADO"){
+                  await subcategoryProvider.getSubcategorias();
+                  Navigator.pushNamed(context, CategoryDetailScreen.routerName);
+                  print("el usuario esta aprobado");
+                }
+                else{
+                    // Mostrar mensaje de snackbar de respuesta
+                    NotificationsService.showSnackbar("Usted no tiene acceso a esta categoria");
+                }
+              }else{
+                    // Mostrar mensaje de snackbar de respuesta
+                    NotificationsService.showSnackbar("Usted no tiene acceso a esta categoria");
+                }
+              
             },
             child: Container(
               margin: EdgeInsets.only( top: 10, bottom: 5),
@@ -307,7 +331,18 @@ class _List extends StatelessWidget {
                     Container(
                       padding: EdgeInsets.only(left: MediaQuery.of(context).size.width*0.01,),
                       child: IconButton(icon: const Icon(Icons.add, size: 28, color: AppTheme.primary,), onPressed: ()async{
-                        await suscripcionProvider.createSuscripcion(categoryProvider.categorias[index].id!);
+                        if(authService.suscripciones.contains((element) => element.categoria.id == categoryProvider.selectedCategory.id)){
+                          return NotificationsService.showSnackbar("Usted ya se encuentra suscrito a esta categoria");
+                        }else{
+                          final message = await suscripcionProvider.createSuscripcion(categoryProvider.categorias[index].id!);
+                          if(message == null){
+                            NotificationsService.showSnackbar("Se ha creado su suscripcion con exito, deberas esperar a que el administrador apruebe tu solicitud");
+                          }else{
+                            NotificationsService.showSnackbar("Usted ya se encuentra suscrito a esta categoria");
+
+                          }
+                        }
+
                       },),
                     ),
 

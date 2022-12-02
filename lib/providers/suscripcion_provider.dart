@@ -127,8 +127,8 @@ class SuscripcionProvider with ChangeNotifier {
     if( decodedResp.containsKey('estado')) {
       return null;
     }else{
-      print(decodedResp['errors']);
-      return decodedResp['errors'][0];
+      print('error en createSuscripcion: ${decodedResp['errors'][0]['msg']}');
+      return decodedResp['errors'][0]['msg'];
     }
       
     } catch (e) {

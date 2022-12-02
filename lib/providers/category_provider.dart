@@ -35,14 +35,9 @@ class CategoryProvider with ChangeNotifier {
 
   List<Tag>  get copyTags {
       List<Tag> tagsTemp = [];
-      for (var i = 0; i < tags.length-1; i++) {
-        tagsTemp.add(tags[i]);
-        // print(tags[i].name);
+      for (var element in tags) {
+        tagsTemp.add(element);
       }
-      // for (var i = 0; i < tagsTemp.length; i++) {
-      //   print(tagsTemp[i].name);
-        
-      // }
       return tagsTemp;
   }
 // final _APIKEY = 'eae7a8c6d2f840d1a2595dafe0a195df';
@@ -149,10 +144,14 @@ class CategoryProvider with ChangeNotifier {
     headers: {
     "Content-Type": "application/json", 
     'x-token': token
+    });
+    if(resp.statusCode ==200) {
+      final index = categorias.indexWhere((element) => element.id == categoria.id);
+      categorias[index] = categoria;
+      print(categoria.nombre);
+      return categoria.id;
     }
-    ,).timeout(const Duration(milliseconds: 8000));
   
-    return categoria.id;
   }
 
 
@@ -178,11 +177,11 @@ class CategoryProvider with ChangeNotifier {
     }
     ).timeout(const Duration(seconds: 30));
     print(resp.body);  
-    categorias.add(categoria);
     
     final Map<String, dynamic> decodedResp = json.decode( resp.body);
 
     if( decodedResp.containsKey('id_profesor')) {
+      categorias.add(categoria);
       final index = categorias.indexWhere((element) => element.id == categoria.id);
       categorias[index] = categoria;
 

@@ -131,25 +131,23 @@ class _CategoryFormState extends State<_CategoryForm> {
   final CategoryProvider categoryProvider = Provider.of<CategoryProvider>(context);
 
 
-  List<String> tagsImport = [];
-  // categoryProvider.copyTags;
+  final tagsImport = categoryProvider.copyTags;
   
 
-    // @override
-    //   initState() {
-    //     super.initState();
-    //     for (var i = 0; i < tagsImport.length; i++) {
-    //       if(categoryProvider.selectedCategory.tags.contains(tagsImport[i].name)){
-    //         tagsImport[i].isSelected = true;
-    //         print('tagsImport[$i]');
-    //         print(tagsImport[i]);
-    //       }
-    //     }
-    //     setState(() {
-          
-    //     });
+    @override
+      initState() {
+        super.initState();
+        for (var i = 0; i < tagsImport.length; i++) {
+          if(categoryProvider.selectedCategory.tags.contains(tagsImport[i].name)){
+            tagsImport[i].isSelected = true;
+            ChangeNotifier();
+            print('tagsImport[$i]');
+            print(tagsImport[i]);
+          }
+        }
+        setState(() {});
 
-    //   }
+      }
 
     return Column(
       children: [
@@ -209,23 +207,19 @@ class _CategoryFormState extends State<_CategoryForm> {
                           ...List.generate(
                             tagsImport.length,
                             (i) => FilterChip(
-                              selected: tagsImport[i].isSelected,
+                              selected: categoryProvider.selectedCategory.tags.contains(tagsImport[i].name),
                               onSelected: (bool selected) {
-                                setState(() {
-                                  tagsImport[i].isSelected = selected;
-
-                                  print(tagsImport[i].name);
-                                  print(categoria.tags);
-                                });
-                                if (tagsImport[i].isSelected) {
-                                  categoria.tags.removeWhere((String name) {
-                                    return name == categoria.tags;
-                                  });
+                                  
+                                if (!selected) {
+                                  final index = categoryProvider.selectedCategory.tags.indexWhere((element) => element == tagsImport[i].name);
+                                    categoryProvider.selectedCategory.tags.removeAt(index);
+                                    ChangeNotifier();
                                 } else {
-                                  if(!categoria.tags.contains(tagsImport[i].name)){
-                                    categoria.tags.add(tagsImport[i].name);
-                                  }
+                                    categoryProvider.selectedCategory.tags.add(tagsImport[i].name);
                                 }
+                                setState(() {
+                                    print(categoryProvider.selectedCategory.tags);
+                                  });
                               },
                             
                               labelStyle: const TextStyle(fontSize: 10),

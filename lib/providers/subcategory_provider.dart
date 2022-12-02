@@ -132,8 +132,8 @@ class SubcategoryProvider with ChangeNotifier {
     };
     print(subcategoria.idCategoria);
     final url = Uri.parse( '$_baseURL/api/subcategoria/${subcategoria.idCategoria}');
-    print('CREAR-----------------');
     print(url);
+    print('CREAR-----------------');
     try {
     final resp = await http.post(url,
     body: json.encode(subcategoryData),

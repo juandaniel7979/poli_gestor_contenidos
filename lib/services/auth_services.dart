@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:poli_gestor_contenidos/models/suscripcion_response.dart';
 import 'package:poli_gestor_contenidos/models/users_stats.dart';
 
 class AuthService extends ChangeNotifier{
@@ -24,6 +25,8 @@ class AuthService extends ChangeNotifier{
     uid: '' 
     ); 
 
+  List<Suscripcion> suscripciones = [];
+
   File? newPictureFile;
 
   bool _isLoading = true;
@@ -34,6 +37,7 @@ class AuthService extends ChangeNotifier{
     final token = readToken();
     if(token != null || token !="") {
       getUsuario();
+      getSuscripciones();
     }
   }
   // Si retornamos algo es un error, sino todo bien
@@ -88,7 +92,13 @@ class AuthService extends ChangeNotifier{
     if( decodedResp.containsKey('token')) {
       storage.write(key: 'token', value: decodedResp['token']);
       usuario = Usuario.fromMap(decodedResp['usuario']);
+      final token_device = storage.read(key: 'token_device');
+      print(token_device);
+      final url2 = Uri.http( _baseUrl, '/api/usuarios', );
+      // await http.put(url2, {
 
+      // })
+      await getSuscripciones();
       print(usuario.nombreCompleto);
       return null;
     }else{ 
@@ -119,6 +129,28 @@ class AuthService extends ChangeNotifier{
     await storage.delete(key: 'token');
     return;
   }
+  
+  
+  Future getSuscripciones() async {
+    
+    final url = Uri.http( _baseUrl, '/api/suscripcion/usuario', );
+    final resp = await http.get(url,
+    headers: {
+      "Content-Type": "application/json",
+      'x-token': await readToken()
+      },
+    );
+    print(resp.body);
+    final Map<String, dynamic> decodedResp = json.decode( resp.body);
+    if( decodedResp.containsKey('suscripciones')) {
+      final suscripcionResponse = Suscripciones.fromJson(resp.body);
+      suscripciones.addAll(suscripcionResponse.suscripciones);
+      return null;
+    }else{ 
+      print(decodedResp['msg']);
+      return decodedResp['msg']; }
+  }
+  
 
   Future<String> readToken() async {
 
