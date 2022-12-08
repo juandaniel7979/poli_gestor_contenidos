@@ -79,6 +79,10 @@ class _RegisterForm extends StatelessWidget {
                     print(loginForm.rol);
                   }
                   break;
+                  default:
+                    loginForm.rol = "ESTUDIANTE";
+                    print(loginForm.rol);
+                  break;
                 }
               },
               labelColor: Colors.white,
@@ -277,14 +281,14 @@ class _FormRegister extends StatelessWidget {
               loginForm.isLoading = true;
               // await Future.delayed(const Duration(seconds: 2));
               
-              final String? errorMessage = await authService.createUser( loginForm.uid, loginForm.correo, loginForm.contrasena, loginForm.nombre, loginForm.nombre2, loginForm.apellido, loginForm.apellido2, loginForm.rol).timeout(const Duration(milliseconds: 12000));
+              final String? errorMessage = await authService.createUser( loginForm.uid, loginForm.correo, loginForm.contrasena, loginForm.nombre, loginForm.nombre2, loginForm.apellido, loginForm.apellido2, loginForm.rol != "" ? loginForm.rol : "ESTUDIANTE" ).timeout(const Duration(milliseconds: 12000));
       
               if( errorMessage == null ) {
       
                 Navigator.pushReplacementNamed(context, LoginScreen.routerName);
       
               }else{
-                NotificationsService.showSnackbar("se presentó un problema al registrar");
+                NotificationsService.showSnackbar(errorMessage != "" || errorMessage != null ? errorMessage :"se presentó un problema al registrar");
                 loginForm.isLoading = false;
               }
           },

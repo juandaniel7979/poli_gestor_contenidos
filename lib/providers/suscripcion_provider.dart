@@ -78,6 +78,10 @@ class SuscripcionProvider with ChangeNotifier {
     ,).timeout(const Duration(milliseconds: 8000));
     print(resp.body);
 
+    final index = suscripcions.indexWhere((element) => element.usuario.uid == id);
+    suscripcions.removeAt(index);
+    notifyListeners();
+
     return null;
   }
 

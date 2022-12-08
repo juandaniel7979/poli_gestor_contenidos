@@ -162,6 +162,26 @@ class SubcategoryProvider with ChangeNotifier {
     }
   }
 
+
+    Future deleteSubcategory( Subcategoria subcategoria ) async {
+      
+      final token = await storage.read(key: 'token') ?? '';
+      if(token =='' || token == null){ print('No hay token en el request: '); return null;}
+      final url = Uri.parse( '$_baseURL/api/subcategoria/${subcategoria.id}');
+      final resp = await http.delete(url,
+      headers: {
+      "Content-Type": "application/json", 
+      'x-token': token
+      });
+      if(resp.statusCode == 200) {
+        final index = subcategorias.indexWhere((element) => element.id == subcategoria.id);
+        subcategorias.removeAt(index);
+        notifyListeners();
+        print(subcategoria.nombre);
+        return subcategoria.id;
+      }
+  
+  }
   
   void updateSelectedSubategoryImage (String path) async {
 

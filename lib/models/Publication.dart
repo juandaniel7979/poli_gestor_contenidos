@@ -5,6 +5,9 @@
 import 'package:meta/meta.dart';
 import 'dart:convert';
 
+import 'package:poli_gestor_contenidos/models/users_stats.dart';
+
+
 class Publicaciones {
     Publicaciones({
         required this.publicaciones,
@@ -33,6 +36,7 @@ class Publicacion {
         required this.descripcion,
         required this.imagenes,
         required this.estado,
+        this.profesor,
     });
 
     String id;
@@ -40,6 +44,7 @@ class Publicacion {
     String idProfesor;
     String descripcion;
     final List<String> imagenes;
+    Usuario? profesor;
     String estado;
 
     factory Publicacion.fromJson(String str) => Publicacion.fromMap(json.decode(str));
@@ -53,6 +58,7 @@ class Publicacion {
         descripcion: json["descripcion"],
         imagenes: List<String>.from(json["imagenes"].map((x) => x)),
         estado: json["estado"],
+        profesor: Usuario.fromMap(json['profesor'][0])
     );
 
     Map<String, dynamic> toMap() => {
@@ -62,6 +68,7 @@ class Publicacion {
         "descripcion": descripcion,
         "imagenes": List<dynamic>.from(imagenes.map((x) => x)),
         "estado": estado,
+        "profesor": profesor
     };
 
 

@@ -23,7 +23,7 @@ class PushNotificationService {
 
   static Future _onMessageHandler ( RemoteMessage message) async {    
     print('On Message Handler ${ message.messageId}');
-    _messageStream.add(message.data['id_categoria'] ?? 'no data');
+    _messageStream.add(message.data['mensaje'] ?? 'no data');
   }
 
   static Future _onOpenMessageOpenApp ( RemoteMessage message) async {

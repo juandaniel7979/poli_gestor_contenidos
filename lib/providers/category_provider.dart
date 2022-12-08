@@ -145,7 +145,7 @@ class CategoryProvider with ChangeNotifier {
     "Content-Type": "application/json", 
     'x-token': token
     });
-    if(resp.statusCode ==200) {
+    if(resp.statusCode == 200) {
       final index = categorias.indexWhere((element) => element.id == categoria.id);
       categorias[index] = categoria;
       print(categoria.nombre);
@@ -197,6 +197,27 @@ class CategoryProvider with ChangeNotifier {
       isSaving = false;
     }
   }
+
+    Future deleteCategory( Categoria categoria ) async {
+      
+      final token = await storage.read(key: 'token') ?? '';
+      if(token =='' || token == null){ print('No hay token en el request: '); return null;}
+      final url = Uri.parse( '$_baseURL/api/categoria/${categoria.id}');
+      final resp = await http.delete(url,
+      headers: {
+      "Content-Type": "application/json", 
+      'x-token': token
+      });
+      if(resp.statusCode == 200) {
+        final index = categorias.indexWhere((element) => element.id == categoria.id);
+        categorias.removeAt(index);
+        notifyListeners();
+        print(categoria.nombre);
+        return categoria.id;
+      }
+  
+  }
+
 
   
   void updateSelectedCategoryImage (String path) async {

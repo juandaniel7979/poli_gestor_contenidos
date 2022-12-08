@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:poli_gestor_contenidos/forms/publication_form_provider.dart';
 import 'package:poli_gestor_contenidos/models/models.dart';
+import 'package:poli_gestor_contenidos/providers/category_provider.dart';
 import 'package:poli_gestor_contenidos/providers/publication_provider.dart';
 import 'package:poli_gestor_contenidos/providers/subcategory_provider.dart';
 import 'package:poli_gestor_contenidos/screens/publication_edit_screen.dart';
@@ -20,6 +21,7 @@ class FeedbackScreen extends StatelessWidget {
     final publicationProvider = Provider.of<PublicationProvider>(context);
     final subcategoryProvider = Provider.of<SubcategoryProvider>(context);
     final authService = Provider.of<AuthService>(context, listen: false);
+    final categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
 
 
     if( publicationProvider.isLoading ) return const LoadingScreen();
@@ -45,7 +47,10 @@ class FeedbackScreen extends StatelessWidget {
           ),
       )
       : _ListPublications(publicationProvider: publicationProvider),
-      floatingActionButton: FloatingActionButton(
+      
+      floatingActionButton: 
+      (authService.usuario.uid == categoryProvider.selectedCategory.idProfesor)
+      ?FloatingActionButton(
         backgroundColor: AppTheme.secondary,
         child: const Icon(Icons.add),
         onPressed: (){
@@ -60,7 +65,7 @@ class FeedbackScreen extends StatelessWidget {
             );
           Navigator.pushNamed(context, PublicationEditScreen.routerName);
         },
-    ),
+    ): null
     // bottomNavigationBar: _Navegacion(),
     );
   }
@@ -76,6 +81,42 @@ class _ListPublications extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context, listen: false);
+    final categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
+    void _showcontent(index) {
+        showDialog(
+          context: context, barrierDismissible: false, // user must tap button!
+
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Estas seguro que desea borrar esta categoria?'),
+              content: SingleChildScrollView(
+                child: ListBody(
+                  children: [
+                    Text('Si eliminas la publicacion, no podras recuperarla'),
+                  ],
+                ),
+              ),
+              actions: [
+                ElevatedButton(
+                  child: new Text('Cancelar'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                ElevatedButton(
+                  child: new Text('Ok'),
+                  style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.red)),
+                  onPressed: () {
+                    publicationProvider.deletePublicacion(publicationProvider.publicaciones[index]);
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
     return ListView.builder(
       itemCount: publicationProvider.publicaciones.length,
       itemBuilder: ((context, index){
@@ -94,18 +135,31 @@ class _ListPublications extends StatelessWidget {
                       children: [
                         CircleAvatar(
                       onBackgroundImageError: (exception, stackTrace) => Colors.white,
-                      // backgroundImage: NetworkImage(publicationProvider.publications[index].picture ?? 'https://placeholder.com/300x300')),
-                      backgroundImage: NetworkImage('https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/one-piece-luffy-1589967502.jpg')),
+                      backgroundImage: NetworkImage(authService.usuario.imagen!= null && authService.usuario.imagen!= '' ? authService.usuario.imagen! : 'https://placeholder.com/300x300')),
+                      // backgroundImage: NetworkImage('https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/one-piece-luffy-1589967502.jpg')),
                     const SizedBox( width: 10,),
-                    Text('Juan Daniel Vargas Ramírez',textAlign: TextAlign.start, style: TextStyle( fontSize: 18,fontWeight: FontWeight.bold, color: Colors.black),),
+                    Text(publicationProvider.publicaciones[index].profesor!.nombreCompleto ,textAlign: TextAlign.start, style: const TextStyle( fontSize: 18,fontWeight: FontWeight.bold, color: Colors.black),),
                       ],
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.settings, 
-                      color: Colors.red
-                      ),
-                      onPressed: () {},
-                      ),
+                    if(authService.usuario.uid == categoryProvider.selectedCategory.idProfesor)
+                    PopupMenuButton<int>(
+                          onSelected: (item) {
+                            switch (item) {
+                              case 0:
+                                publicationProvider.selectedPublicacion = publicationProvider.publicaciones[index].copy();
+                                Navigator.pushNamed(context, PublicationEditScreen.routerName);
+                                break;
+                              case 1:
+                                _showcontent(index);
+                                // categoryProvider.deleteCategory(categoryProvider.categorias[index]);
+                                break;
+                            }
+                          },
+                          itemBuilder: (context) => [
+                            const PopupMenuItem<int>(value: 0, child: Text('Editar')),
+                            const PopupMenuItem<int>(value: 1, child: Text('Eliminar')),
+                          ],
+                        ),
                   ],
                 ),
                 Container(

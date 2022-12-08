@@ -38,7 +38,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Divider(),
               SwitchListTile.adaptive(
                 value: Preferences.isDarkMode,
-                title: const Text('Darkmode'),
+                title: const Text('Modo oscuro'),
                 onChanged: ( value ){
                     Preferences.isDarkMode = value;
                     final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
@@ -51,39 +51,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 }
               ),
               Divider(),
-              RadioListTile<int>(
-                value: 1,
-                groupValue: Preferences.gender,
-                title: const Text('Masculino'),
-                onChanged: ( value ){
-                  Preferences.gender = value ?? 1;
-                  setState(() {});
-                }
-              ),
-              RadioListTile<int>(
-                value: 2,
-                groupValue: Preferences.gender,
-                title: const Text('Femenino'),
-                onChanged: ( value ){
-                  Preferences.gender = value ?? 2;
-                  setState(() {});
-                }
-              ),
-              Divider(),
-              Padding(
-                padding: const EdgeInsets.symmetric( horizontal: 20 ),
-                child: TextFormField(
-                  initialValue: Preferences.name,
-                  onChanged: ( value ) {
-                    Preferences.name = value;
-                    setState(() {});
-                  },
-                  decoration: InputDecoration(
-                    labelText: 'Nombre',
-                    helperText: 'Nombre del usuarios',
-                  ),
-                ),
-              )
+              
             ]
           ),
         ),

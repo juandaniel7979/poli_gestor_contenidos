@@ -21,7 +21,9 @@ class PublicationCard extends StatelessWidget {
         alignment: Alignment.bottomLeft,
         children: [
           // _BackgroundImage( url: publication.picture,),
-          _BackgroundImage( url: 'https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/one-piece-luffy-1589967502.jpg',),
+          publication.imagenes.length>0
+          ? _BackgroundImage( url: publication.imagenes[1],)
+          :Container(height: 25,)
         ],
       ),
       );

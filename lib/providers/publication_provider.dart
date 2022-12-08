@@ -148,10 +148,29 @@ class PublicationProvider with ChangeNotifier {
     }
   }
 
+
+    Future deletePublicacion( Publicacion publicacion ) async {
+      
+      final token = await storage.read(key: 'token') ?? '';
+      if(token =='' || token == null){ print('No hay token en el request: '); return null;}
+      final url = Uri.parse( '$_baseURL/api/publicacion/${publicacion.id}');
+      final resp = await http.delete(url,
+      headers: {
+      "Content-Type": "application/json", 
+      'x-token': token
+      });
+      if(resp.statusCode == 200) {
+        final index = publicaciones.indexWhere((element) => element.id == publicacion.id);
+        publicaciones.removeAt(index);
+        notifyListeners();
+        return publicacion.id;
+      }
+    }
+  
   
   void updateSelectedPublicationImage (String path) async {
 
-    selectedPublicacion.imagenes.add(path) ; 
+    // selectedPublicacion.imagenes.add(path) ; 
     newPictureFile = File.fromUri(Uri(path: path));
     notifyListeners();
   }

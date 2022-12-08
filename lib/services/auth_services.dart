@@ -68,6 +68,8 @@ class AuthService extends ChangeNotifier{
       // Hay que guardarlo en un lugar seguro
       print(decodedResp['usuario']);
       return null;
+    }else if(decodedResp.containsKey('msg')){
+      return decodedResp['msg'];
     }else{
       print(decodedResp['errors'][0]);
       return 'error';
@@ -92,12 +94,23 @@ class AuthService extends ChangeNotifier{
     if( decodedResp.containsKey('token')) {
       storage.write(key: 'token', value: decodedResp['token']);
       usuario = Usuario.fromMap(decodedResp['usuario']);
-      final token_device = storage.read(key: 'token_device');
+      final token_device = await storage.read(key: 'token_device');
       print(token_device);
-      final url2 = Uri.http( _baseUrl, '/api/usuarios', );
-      // await http.put(url2, {
 
-      // })
+      final Map<String,dynamic> device_data = {
+      'device': token_device
+    };
+      final url2 = Uri.parse( 'http://$_baseUrl/api/usuarios/dispositivo/registrar-dispositivo', );
+      final tokenResp = await http.put(url2,
+          headers: {
+            "Content-Type": "application/json",
+            "x-token":  decodedResp['token']
+          },
+          body: jsonEncode(device_data)
+          );
+      if(tokenResp.statusCode==200){
+        print("se registro el token con exito");
+      }
       await getSuscripciones();
       print(usuario.nombreCompleto);
       return null;

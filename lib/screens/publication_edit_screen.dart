@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:poli_gestor_contenidos/forms/publication_form_provider.dart';
 import 'package:poli_gestor_contenidos/forms/subcategory_form_provider.dart';
+import 'package:poli_gestor_contenidos/models/login_user.dart';
 import 'package:poli_gestor_contenidos/models/models.dart';
 import 'package:poli_gestor_contenidos/providers/providers.dart';
 import 'package:poli_gestor_contenidos/providers/publication_provider.dart';
+import 'package:poli_gestor_contenidos/services/auth_services.dart';
 import 'package:poli_gestor_contenidos/share_preferences/preferences.dart';
 import 'package:poli_gestor_contenidos/themes/app_theme.dart';
 import 'package:poli_gestor_contenidos/ui/input_decorations.dart';
@@ -41,89 +43,87 @@ class _PublicationScreenBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final publicationForm = Provider.of<PublicationFormProvider>(context); 
-    return DefaultTabController(
-      length: 2,
-      initialIndex: publicationProvider.selectedPublicacion.estado == 'PUBLICO' ? 0 : 1,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('Subcategoria : { Subcategoria}'),
-        ),
-        body: SingleChildScrollView(
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          child: Column(
-            children: [
-              Stack(
-                children: [
+    final usuario = Provider.of<AuthService>(context,listen: false); 
+    return Scaffold(
+      body: SingleChildScrollView(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+        child: Column(
+          children: [
+            Stack(
+              children: [
 // TODO: listViewBuilder imagenes
-                // BackgroundImage( url: publicationService.selectedPublicacion.picture,),
-                BackgroundImage( url: 'https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/one-piece-luffy-1589967502.jpg',),
-                  Positioned(
-                    top: 60,
-                    left: 15,
-                    child: IconButton(
-                      onPressed: () {
-                      publicationProvider.selectedPublicacion = Publicacion(
-                                  id: '',
-                                  idSubcategoria: '',
-                                  idProfesor: '',
-                                  descripcion: '',
-                                  estado: 'PUBLICO',
-                                  imagenes: [],
-                                  );
-                        Navigator.of(context).pop();
-                      },
-                      icon: const Icon( Icons.arrow_back_ios_new, size: 40, color: Colors.white,),
-                    ),
+              // BackgroundImage( url: publicationService.selectedPublicacion.picture,),
+                publicationProvider.selectedPublicacion.imagenes.length>0
+                ?BackgroundImage( url: publicationProvider.selectedPublicacion.imagenes[0],)
+                :BackgroundImage( url: '',),
+                Positioned(
+                  top: 60,
+                  left: 15,
+                  child: IconButton(
+                    onPressed: () {
+                    publicationProvider.selectedPublicacion = Publicacion(
+                                id: '',
+                                idSubcategoria: '',
+                                idProfesor: '',
+                                descripcion: '',
+                                estado: 'PUBLICO',
+                                imagenes: [],
+                                profesor: usuario.usuario
+                                );
+                      Navigator.of(context).pop();
+                    },
+                    icon: const Icon( Icons.arrow_back_ios_new, size: 40, color: Colors.white,),
                   ),
-                  Positioned(
-                    top: 60,
-                    right: 20,
-                    child: IconButton(
-                      onPressed: () async {
-                        final picker = ImagePicker();
-                        final XFile? pickedFile = await picker.pickImage(
-                          source: ImageSource.camera,
-                          // source: ImageSource.gallery,
-                          imageQuality: 100
-                          ); 
+                ),
+                Positioned(
+                  top: 60,
+                  right: 20,
+                  child: IconButton(
+                    onPressed: () async {
+                      final picker = ImagePicker();
+                      // final filePicker
+                      final XFile? pickedFile = await picker.pickImage(
+                        source: ImageSource.camera,
+                        // source: ImageSource.gallery,
+                        imageQuality: 100
+                        ); 
     
-                          if( pickedFile == null) {
-                            print('No seleccionó nada');
-                            return;
-                          }
-                          print('Tenemos imagen ${ pickedFile.path}');
-                          publicationProvider.updateSelectedPublicationImage(pickedFile.path);
-                      },
-                      icon: const Icon( Icons.camera_alt_outlined, size: 40, color: Colors.white,),
-                    ),
+                        if( pickedFile == null) {
+                          print('No seleccionó nada');
+                          return;
+                        }
+                        print('Tenemos imagen ${ pickedFile.path}');
+                        publicationProvider.updateSelectedPublicationImage(pickedFile.path);
+                    },
+                    icon: const Icon( Icons.camera_alt_outlined, size: 40, color: Colors.white,),
                   ),
-                ],
-              ),
-              const SizedBox( height: 30,),
-              const _PublicationForm(),
-            ],
-          ),
+                ),
+              ],
+            ),
+            const SizedBox( height: 30,),
+            const _PublicationForm(),
+          ],
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: AppTheme.secondary,
-          onPressed: publicationProvider.isSaving
-          ? null
-          : () async {
-            if( !publicationForm.isValidForm() ) return;
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: AppTheme.secondary,
+        onPressed: publicationProvider.isSaving
+        ? null
+        : () async {
+          if( !publicationForm.isValidForm() ) return;
     
-              final String? imageUrl = await publicationProvider.uploadImage();
+            final String? imageUrl = await publicationProvider.uploadImage();
+            publicationForm.publication.profesor = usuario.usuario;
+            if( imageUrl != null ) publicationForm.publication.imagenes.add(imageUrl);
+            // print(publicationForm.publicacion.imagen);
+            // print(publicationForm.publicacion.estado);
+            await publicationProvider.saveOrCreatePublicacion(publicationForm.publication);
     
-              if( imageUrl != null ) publicationForm.publication.imagenes.add(imageUrl);
-              // print(publicationForm.publicacion.imagen);
-              // print(publicationForm.publicacion.estado);
-              await publicationProvider.saveOrCreatePublicacion(publicationForm.publication);
-    
-          },
-          child: publicationProvider.isSaving   
-          ? const CircularProgressIndicator( color: Colors.white,)
-          : const Icon( Icons.save_outlined),
-        ),
+        },
+        child: publicationProvider.isSaving   
+        ? const CircularProgressIndicator( color: Colors.white,)
+        : const Icon( Icons.save_outlined),
       ),
     );
   }
@@ -163,6 +163,8 @@ class _PublicationForm extends StatelessWidget {
                       style: TextStyle(color: Preferences.isDarkMode ? Colors.white : Colors.black),
                       initialValue: publicacion.descripcion,
                       onChanged: (value) => publicacion.descripcion = value,
+                      maxLines: null,
+                      keyboardType: TextInputType.multiline,
                       validator: (value) {
                         if( value == null || value.isEmpty){
                           return 'La descripcion es obligatorio';
@@ -177,33 +179,33 @@ class _PublicationForm extends StatelessWidget {
                     
                     const SizedBox( height: 30,),
 
-                    TabBar(
-                      onTap: (selectedRol) {
-                      switch(selectedRol) {
-                        case 0: {
-                          publicationForm.publication.estado = "PUBLICO";
-                          print(publicationForm.publication.estado);
-                        }
-                        break;
-                        case 1: {
-                          publicationForm.publication.estado = "PRIVADO";
-                          print(publicationForm.publication.estado);
-                        }
-                        break;
+                    // TabBar(
+                    //   onTap: (selectedRol) {
+                    //   switch(selectedRol) {
+                    //     case 0: {
+                    //       publicationForm.publication.estado = "PUBLICO";
+                    //       print(publicationForm.publication.estado);
+                    //     }
+                    //     break;
+                    //     case 1: {
+                    //       publicationForm.publication.estado = "PRIVADO";
+                    //       print(publicationForm.publication.estado);
+                    //     }
+                    //     break;
 
-                      }
-                    },
-                    labelColor: Colors.white,
-                    unselectedLabelColor: Colors.grey,
-                    indicator: BoxDecoration(
-                      color: AppTheme.primary,
-                      borderRadius: BorderRadius.circular(10)
-                    ),
-                      tabs: const [
-                        Tab(text: 'PUBLICO', icon: Icon(Icons.public)),
-                        Tab(text: 'PRIVADO', icon: Icon(Icons.lock),),
-                      ]
-                    ),
+                    //   }
+                    // },
+                    // labelColor: Colors.white,
+                    // unselectedLabelColor: Colors.grey,
+                    // indicator: BoxDecoration(
+                    //   color: AppTheme.primary,
+                    //   borderRadius: BorderRadius.circular(10)
+                    // ),
+                    //   tabs: const [
+                    //     Tab(text: 'PUBLICO', icon: Icon(Icons.public)),
+                    //     Tab(text: 'PRIVADO', icon: Icon(Icons.lock),),
+                    //   ]
+                    // ),
                   
                     const SizedBox( height: 30,),
                   

@@ -52,7 +52,7 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     PushNotificationService.messagesStream.listen((message) {
       print('My app: ${message}');
-      navigatorKey.currentState?.pushNamed(SettingsScreen.routerName, arguments: message);
+      // navigatorKey.currentState?.pushNamed(SettingsScreen.routerName, arguments: message);
       final snackBar = SnackBar(content: Text(message));
       NotificationsService.messengerKey.currentState?.showSnackBar(snackBar);
 

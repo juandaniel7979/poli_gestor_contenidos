@@ -215,8 +215,43 @@ class _List extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     final authService = Provider.of<AuthService>(context, listen: false);
+
+      void _showcontent(index) {
+        showDialog(
+          context: context, barrierDismissible: false, // user must tap button!
+
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Estas seguro que desea borrar esta categoria?'),
+              content: SingleChildScrollView(
+                child: ListBody(
+                  children: [
+                    Text('Se eliminara la categoria ${categoryProvider.categorias[index].nombre}'),
+                  ],
+                ),
+              ),
+              actions: [
+                ElevatedButton(
+                  child: new Text('Cancelar'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                ElevatedButton(
+                  child: new Text('Ok'),
+                  style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.red)),
+                  onPressed: () {
+                    categoryProvider.deleteCategory(categoryProvider.categorias[index]);
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
+
 
     return Expanded(
       child: ListView.builder(
@@ -236,22 +271,24 @@ class _List extends StatelessWidget {
                 print("el usuario es profesor de la categoria");
                 return;
               }
-
-              if(authService.suscripciones.length>0 && authService.suscripciones.contains((element) => element.categoria.id == categoryProvider.selectedCategory.id)){
+              print(authService.suscripciones.where((element) => element.usuario.estado == "APROBADO").length);
+              if(authService.suscripciones.where((element) => element.categoria.id == categoryProvider.selectedCategory.id).length>0){
                 final i = authService.suscripciones.indexWhere((element) => element.categoria.id == categoryProvider.selectedCategory.id);
 
                 // Validar suscripcion del usuario antes de redireccionarlo
-                
+                print(authService.suscripciones[i].estado);
                 if(authService.suscripciones[i].estado == "APROBADO"){
                   await subcategoryProvider.getSubcategorias();
                   Navigator.pushNamed(context, CategoryDetailScreen.routerName);
                   print("el usuario esta aprobado");
                 }
                 else{
+                    print('esta cayendo aqui 1');
                     // Mostrar mensaje de snackbar de respuesta
                     NotificationsService.showSnackbar("Usted no tiene acceso a esta categoria");
                 }
               }else{
+                    print('esta cayendo aqui 2');
                     // Mostrar mensaje de snackbar de respuesta
                     NotificationsService.showSnackbar("Usted no tiene acceso a esta categoria");
                 }
@@ -317,7 +354,8 @@ class _List extends StatelessWidget {
                                   Navigator.pushNamed(context, CategoryEditScreen.routerName);
                                   break;
                                 case 1:
-                                  // TODO: ELIMINAR
+                                  _showcontent(index);
+                                  // categoryProvider.deleteCategory(categoryProvider.categorias[index]);
                                   break;
                               }
                             },
@@ -330,11 +368,16 @@ class _List extends StatelessWidget {
                     : 
                     Container(
                       padding: EdgeInsets.only(left: MediaQuery.of(context).size.width*0.01,),
-                      child: IconButton(icon: const Icon(Icons.add, size: 28, color: AppTheme.primary,), onPressed: ()async{
+                      child: IconButton(icon: 
+                      (authService.suscripciones.where((element) => element.categoria.id == categoryProvider.categorias[index].id).length>0)
+                      ?Icon(Icons.check, size: 28, color: AppTheme.primary,)
+                      : Icon(Icons.add, size: 28, color: AppTheme.primary,), onPressed: ()async{
                         if(authService.suscripciones.contains((element) => element.categoria.id == categoryProvider.selectedCategory.id)){
                           return NotificationsService.showSnackbar("Usted ya se encuentra suscrito a esta categoria");
                         }else{
                           final message = await suscripcionProvider.createSuscripcion(categoryProvider.categorias[index].id!);
+                          authService.suscripciones = [];
+                          await authService.getSuscripciones();
                           if(message == null){
                             NotificationsService.showSnackbar("Se ha creado su suscripcion con exito, deberas esperar a que el administrador apruebe tu solicitud");
                           }else{
@@ -344,9 +387,8 @@ class _List extends StatelessWidget {
                         }
 
                       },),
-                    ),
+                    )
 
-                    Container()
                 ],
                 )
             ),
@@ -354,6 +396,7 @@ class _List extends StatelessWidget {
         },
         ),
     );
+
   }
 }
 
@@ -386,4 +429,5 @@ class TagsCategory extends StatelessWidget {
     );
   }
 }
+
 

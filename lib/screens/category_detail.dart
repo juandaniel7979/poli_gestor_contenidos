@@ -8,6 +8,7 @@ import 'package:poli_gestor_contenidos/providers/subcategory_provider.dart';
 import 'package:poli_gestor_contenidos/screens/feedback_screen.dart';
 import 'package:poli_gestor_contenidos/screens/list_categories_screen.dart';
 import 'package:poli_gestor_contenidos/screens/subcategory_edit_screen.dart';
+import 'package:poli_gestor_contenidos/services/auth_services.dart';
 import 'package:poli_gestor_contenidos/share_preferences/preferences.dart';
 import 'package:poli_gestor_contenidos/themes/app_theme.dart';
 import 'package:poli_gestor_contenidos/widgets/background_image.dart';
@@ -23,7 +24,29 @@ class CategoryDetailScreen extends StatelessWidget {
     final categoria = Provider.of<CategoryProvider>(context);
     final subcategoria = Provider.of<SubcategoryProvider>(context);
     final suscripcion = Provider.of<SuscripcionProvider>(context);
+    final usuario = Provider.of<AuthService>(context);
 
+    return 
+    usuario.usuario.uid== categoria.selectedCategory.id
+    ?  ProfesorScreenView(suscripcion: suscripcion, subcategoria: subcategoria, categoria: categoria)
+    : EstudianteScreenView( subcategoria: subcategoria, categoria: categoria);
+  }
+}
+
+class ProfesorScreenView extends StatelessWidget {
+  const ProfesorScreenView({
+    Key? key,
+    required this.suscripcion,
+    required this.subcategoria,
+    required this.categoria,
+  }) : super(key: key);
+
+  final SuscripcionProvider suscripcion;
+  final SubcategoryProvider subcategoria;
+  final CategoryProvider categoria;
+
+  @override
+  Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -120,6 +143,59 @@ class CategoryDetailScreen extends StatelessWidget {
   }
 }
 
+
+class EstudianteScreenView extends StatelessWidget {
+
+  
+  const EstudianteScreenView({
+    Key? key,
+    required this.subcategoria,
+    required this.categoria,
+  }) : super(key: key);
+
+  final SubcategoryProvider subcategoria;
+  final CategoryProvider categoria;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: AppTheme.primary,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios),
+          onPressed: (){
+            subcategoria.subcategorias = [];
+            Navigator.pushReplacementNamed(context, ListCategoriesScreen.routerName);
+          },
+        ),
+        title: Text('Categoria: ${categoria.selectedCategory.nombre}'),
+      ),
+      body: Stack(
+        children: [
+          BackgroundImage(url: categoria.selectedCategory.imagen,),
+          Container(
+            width: double.infinity,
+            margin: const EdgeInsets.only(top: 310),
+            decoration: const BoxDecoration(
+              color:AppTheme.primary
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text('SUBCATEGORIAS', style: TextStyle(color: Colors.white, fontSize: 20),textAlign: TextAlign.center,),
+            )
+          ),
+          Container(
+            margin: EdgeInsets.only(top: 350),
+            height: 500,
+            child: _ListSubcategories(subcategoria: subcategoria)
+          ),
+        ],
+      ),
+      
+    );
+  }
+}
+
 class _ListSubcategories extends StatelessWidget {
   const _ListSubcategories({
     Key? key,
@@ -155,6 +231,8 @@ class _SubcategoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final publicationProvider = Provider.of<PublicationProvider>(context, listen: false);
+    final authService = Provider.of<AuthService>(context, listen: false);
+    final categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
     return GestureDetector(
       onTap: (){
         if(publicationProvider.selectedPublicacion.idSubcategoria != subcategoria.subcategorias[index].id){
@@ -191,6 +269,7 @@ class _SubcategoryCard extends StatelessWidget {
                     ],
                   ),
                 ),
+                if(authService.usuario.uid == categoryProvider.selectedCategory.idProfesor)
                 _SubcategoryIconMenu(subcategoria: subcategoria, index: index),
               
               ],
@@ -213,6 +292,41 @@ class _SubcategoryIconMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+void _showcontent(index) {
+        showDialog(
+          context: context, barrierDismissible: false, // user must tap button!
+
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('¿Estás seguro que desea borrar esta categoria?'),
+              content: SingleChildScrollView(
+                child: ListBody(
+                  children: [
+                    Text('Se eliminara la subcategoria ${subcategoria.subcategorias[index].nombre}'),
+                  ],
+                ),
+              ),
+              actions: [
+                ElevatedButton(
+                  child: new Text('Cancelar'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                ElevatedButton(
+                  child: new Text('Ok'),
+                  style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.red)),
+                  onPressed: () {
+                    subcategoria.deleteSubcategory(subcategoria.subcategorias[index]);
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
+
     return Padding(
       padding: EdgeInsets.only(left: MediaQuery.of(context).size.width*0.01,),
       child: PopupMenuButton<int>(
@@ -224,6 +338,7 @@ class _SubcategoryIconMenu extends StatelessWidget {
               break;
             case 1:
               // TODO: ELIMINAR
+
               break;
           }
         },
@@ -378,6 +493,7 @@ class _SuscriptionCard extends StatelessWidget {
                 children: [
                   // todo
                   Container(
+                    width: 190,
                     child: Text('${suscripcion.usuario.nombreCompleto} ',
                       style: TextStyle(color: Preferences.isDarkMode ?Colors.white : Colors.black45, fontSize: 16, fontWeight: FontWeight.bold),),
                   ),
@@ -390,6 +506,7 @@ class _SuscriptionCard extends StatelessWidget {
                 ],
               ),
             ),
+            if(suscripcion.estado!="APROBADO")
               Container(
                 padding: EdgeInsets.all(2),
                 child: IconButton(
@@ -407,7 +524,7 @@ class _SuscriptionCard extends StatelessWidget {
                     // TODO: RECHAZAR USUARIO
                     suscripcionProvider.rechazarSuscripcion(suscripcion.usuario.uid, suscripcion.categoria.id);
                   },
-                  icon: Icon(Icons.close, color: Colors.red, size: 36,)
+                  icon: Icon(Icons.delete, color: Colors.red, size: 36,)
                   ),
               ),
             ],

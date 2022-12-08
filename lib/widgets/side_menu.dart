@@ -33,21 +33,14 @@ class SideMenu extends StatelessWidget {
               Navigator.pushReplacementNamed(context, ProfileScreen.routerName);
             },
           ),
-          authService.usuario.rol == "ESTUDIANTE"
-          ? ListTile(
-            leading: const Icon( Icons.category_outlined), 
-            title: const Text('Suscripciones'),
-            onTap: () {
-              Navigator.pushReplacementNamed(context, ProfileScreen.routerName);
-            },
-          )
-          : ListTile(
-            leading: const Icon( Icons.category_outlined), 
-            title: const Text('Mis categorias'),
-            onTap: () {
-              Navigator.pushReplacementNamed(context, ProfileScreen.routerName);
-            },
-          ),
+          // if(authService.usuario.rol == "PROFESOR")
+          // ListTile(
+          //   leading: const Icon( Icons.category_outlined), 
+          //   title: const Text('Mis categorias'),
+          //   onTap: () {
+          //     Navigator.pushReplacementNamed(context, ProfileScreen.routerName);
+          //   },
+          // ),
           ListTile(
             leading: const Icon( Icons.settings_outlined,), 
             title: const Text('Configuración'),
