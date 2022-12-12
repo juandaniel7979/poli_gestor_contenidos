@@ -143,11 +143,12 @@ class SubcategoryProvider with ChangeNotifier {
     }
     ).timeout(const Duration(seconds: 30));
     print(resp.body);  
-    subcategorias.add(subcategoria);
     
     final Map<String, dynamic> decodedResp = json.decode( resp.body);
 
     if( decodedResp.containsKey('id_profesor')) {
+    subcategoria.id = decodedResp['_id'];
+    subcategorias.add(subcategoria);
       print('resp.body');
       print(resp.body);
       return null;

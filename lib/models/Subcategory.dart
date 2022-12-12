@@ -36,7 +36,7 @@ class Subcategoria {
         required this.estado,
     });
 
-    final String id;
+    String id;
     String idCategoria;
     final String idProfesor;
     String nombre;

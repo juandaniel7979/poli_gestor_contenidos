@@ -1,11 +1,11 @@
+
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:poli_gestor_contenidos/forms/publication_form_provider.dart';
-import 'package:poli_gestor_contenidos/forms/subcategory_form_provider.dart';
-import 'package:poli_gestor_contenidos/models/login_user.dart';
 import 'package:poli_gestor_contenidos/models/models.dart';
 import 'package:poli_gestor_contenidos/providers/providers.dart';
-import 'package:poli_gestor_contenidos/providers/publication_provider.dart';
 import 'package:poli_gestor_contenidos/services/auth_services.dart';
 import 'package:poli_gestor_contenidos/share_preferences/preferences.dart';
 import 'package:poli_gestor_contenidos/themes/app_theme.dart';
@@ -26,7 +26,7 @@ class PublicationEditScreen extends StatelessWidget {
 
     return ChangeNotifierProvider(
       create: ( _ ) => PublicationFormProvider( publicationProvider.selectedPublicacion ),
-      child: _PublicationScreenBody(publicationProvider: publicationProvider),
+      child: const _PublicationScreenBody(),
       );
   }
 
@@ -35,99 +35,172 @@ class PublicationEditScreen extends StatelessWidget {
 class _PublicationScreenBody extends StatelessWidget {
   const _PublicationScreenBody({
     Key? key,
-    required this.publicationProvider,
   }) : super(key: key);
 
-  final PublicationProvider publicationProvider;
 
   @override
   Widget build(BuildContext context) {
-    final publicationForm = Provider.of<PublicationFormProvider>(context); 
-    final usuario = Provider.of<AuthService>(context,listen: false); 
-    return Scaffold(
-      body: SingleChildScrollView(
-        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-        child: Column(
-          children: [
-            Stack(
-              children: [
-// TODO: listViewBuilder imagenes
-              // BackgroundImage( url: publicationService.selectedPublicacion.picture,),
-                publicationProvider.selectedPublicacion.imagenes.length>0
-                ?BackgroundImage( url: publicationProvider.selectedPublicacion.imagenes[0],)
-                :BackgroundImage( url: '',),
-                Positioned(
-                  top: 60,
-                  left: 15,
-                  child: IconButton(
-                    onPressed: () {
-                    publicationProvider.selectedPublicacion = Publicacion(
-                                id: '',
-                                idSubcategoria: '',
-                                idProfesor: '',
-                                descripcion: '',
-                                estado: 'PUBLICO',
-                                imagenes: [],
-                                profesor: usuario.usuario
-                                );
-                      Navigator.of(context).pop();
-                    },
-                    icon: const Icon( Icons.arrow_back_ios_new, size: 40, color: Colors.white,),
-                  ),
-                ),
-                Positioned(
-                  top: 60,
-                  right: 20,
-                  child: IconButton(
-                    onPressed: () async {
-                      final picker = ImagePicker();
-                      // final filePicker
-                      final XFile? pickedFile = await picker.pickImage(
-                        source: ImageSource.camera,
-                        // source: ImageSource.gallery,
-                        imageQuality: 100
-                        ); 
+    final publicationProvider = Provider.of<PublicationProvider>(context);
+  
+  
+  XFile? _showcontent() {
+      final picker = ImagePicker();
+    showDialog(
+      context: context, barrierDismissible: false, // user must tap button!
     
-                        if( pickedFile == null) {
-                          print('No seleccionó nada');
-                          return;
-                        }
-                        print('Tenemos imagen ${ pickedFile.path}');
-                        publicationProvider.updateSelectedPublicationImage(pickedFile.path);
-                    },
-                    icon: const Icon( Icons.camera_alt_outlined, size: 40, color: Colors.white,),
-                  ),
-                ),
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('¿Estás seguro que desea borrar esta categoria?'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: const [
+                Text('¿Quieres seleccionar una imagen de galeria o tomar una foto?'),
               ],
             ),
-            const SizedBox( height: 30,),
-            const _PublicationForm(),
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () async {
+                final XFile? pickedFile = await picker.pickImage(
+                source: ImageSource.gallery,
+                imageQuality: 100
+                ); 
+        
+                if( pickedFile == null) {
+                  print('No seleccionó nada');
+                  return;
+                }
+                print('Tenemos imagen ${ pickedFile.path}');
+                publicationProvider.updateSelectedPublicationImage(pickedFile.path);
+                Navigator.of(context).pop();
+              },
+              child: const Text('Galeria'),
+            ),
+            ElevatedButton(
+              style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.red)),
+              onPressed: () async{
+              
+              final XFile? pickedFile = await picker.pickImage(
+                source: ImageSource.camera,
+                // source: ImageSource.gallery,
+                imageQuality: 100
+                ); 
+        
+                if( pickedFile == null) {
+                  print('No seleccionó nada');
+                  return;
+                }
+                print('Tenemos imagen ${ pickedFile.path}');
+                publicationProvider.updateSelectedPublicationImage(pickedFile.path);
+                Navigator.of(context).pop();
+              },
+              child: const Text('Camera'),
+            ),
           ],
+        );
+      },
+    );
+    }
+
+
+    final publicationForm = Provider.of<PublicationFormProvider>(context); 
+    final usuario = Provider.of<AuthService>(context); 
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: AppTheme.primary,
+          title: const Text('algo'),
         ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppTheme.secondary,
-        onPressed: publicationProvider.isSaving
-        ? null
-        : () async {
-          if( !publicationForm.isValidForm() ) return;
+        body: SingleChildScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          child: Column(
+            children: [
+              Stack(
+                children: [
+                // TODO: listViewBuilder imagenes
+                // BackgroundImage( url: publicationProvider.selectedPublicacion.imagenes[0],),
+                    publicationProvider.selectedPublicacion.imagenes.isNotEmpty
+                    ?BackgroundImage( url: publicationProvider.selectedPublicacion.imagenes[0],)
+                    :BackgroundImage( url: '',),
     
-            final String? imageUrl = await publicationProvider.uploadImage();
-            publicationForm.publication.profesor = usuario.usuario;
-            if( imageUrl != null ) publicationForm.publication.imagenes.add(imageUrl);
-            // print(publicationForm.publicacion.imagen);
-            // print(publicationForm.publicacion.estado);
-            await publicationProvider.saveOrCreatePublicacion(publicationForm.publication);
-    
-        },
-        child: publicationProvider.isSaving   
-        ? const CircularProgressIndicator( color: Colors.white,)
-        : const Icon( Icons.save_outlined),
+                  Positioned(
+                    top: 60,
+                    left: 15,
+                    child: IconButton(
+                      onPressed: () {
+                      publicationProvider.selectedPublicacion = Publicacion(
+                                  id: '',
+                                  idSubcategoria: '',
+                                  idProfesor: '',
+                                  descripcion: '',
+                                  estado: 'PUBLICO',
+                                  imagenes: [],
+                                  profesor: usuario.usuario
+                                  );
+                        Navigator.of(context).pop();
+                      },
+                      icon: const Icon( Icons.arrow_back_ios_new, size: 40, color: Colors.white,),
+                    ),
+                  ),
+                  Positioned(
+                    top: 60,
+                    right: 20,
+                    child: IconButton(
+                      onPressed: () async {
+                        // final filePicker = await FilePicker.platform.pickFiles(allowMultiple: false);
+                        //   if (filePicker != null) {
+                        //       publicationProvider.updateSelectedPublicationImage(filePicker.files.single.path!);
+                        //   }else{
+                        //     print('No seleccionó nada');
+                        //       return;
+                        //   }
+          
+                        final XFile? pickedFile = _showcontent();
+                  
+                          if( pickedFile == null) {
+                            print('No seleccionó nada');
+                            return;
+                          }
+                          print('Tenemos imagen ${ pickedFile.path}');
+                          publicationProvider.updateSelectedPublicationImage(pickedFile.path);
+
+                      },
+                      icon: const Icon( Icons.camera_alt_outlined, size: 40, color: Colors.white,),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox( height: 30,),
+              const _PublicationForm(),
+            ],
+          ),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: AppTheme.secondary,
+          onPressed: publicationProvider.isSaving
+          ? null
+          : () async {
+            if( !publicationForm.isValidForm() ) return;
+      
+              final String? imageUrl = await publicationProvider.uploadImage();
+              publicationForm.publication.profesor = usuario.usuario;
+              if( imageUrl != null ) publicationForm.publication.imagenes.add(imageUrl);
+              // print(publicationForm.publicacion.imagen);
+              // print(publicationForm.publicacion.estado);
+              await publicationProvider.saveOrCreatePublicacion(publicationForm.publication);
+      
+          },
+          child: publicationProvider.isSaving   
+          ? const CircularProgressIndicator( color: Colors.white,)
+          : const Icon( Icons.save_outlined),
+        ),
       ),
     );
   }
-}
+
+  
+  }
 
 class _PublicationForm extends StatelessWidget {
 

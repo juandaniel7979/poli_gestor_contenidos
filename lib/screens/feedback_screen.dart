@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:poli_gestor_contenidos/forms/publication_form_provider.dart';
 import 'package:poli_gestor_contenidos/models/models.dart';
 import 'package:poli_gestor_contenidos/providers/category_provider.dart';
 import 'package:poli_gestor_contenidos/providers/publication_provider.dart';
 import 'package:poli_gestor_contenidos/providers/subcategory_provider.dart';
-import 'package:poli_gestor_contenidos/screens/publication_edit_screen.dart';
 import 'package:poli_gestor_contenidos/screens/screens.dart';
 import 'package:poli_gestor_contenidos/services/auth_services.dart';
 import 'package:poli_gestor_contenidos/share_preferences/preferences.dart';
@@ -35,10 +33,9 @@ class FeedbackScreen extends StatelessWidget {
       publicationProvider.publicaciones.length < 1
       ? Container(
         width: double.infinity,
-        // color: Colors.red,
         child: Column(
           children: [
-            Image(
+            const Image(
               image: AssetImage('assets/404.png'), fit: BoxFit.cover,
               height: 450,
               ),
@@ -65,8 +62,13 @@ class FeedbackScreen extends StatelessWidget {
             );
           Navigator.pushNamed(context, PublicationEditScreen.routerName);
         },
-    ): null
-    // bottomNavigationBar: _Navegacion(),
+    ): null,
+    // bottomNavigationBar: BottomNavigationBar(
+    //       items: const [
+    //         BottomNavigationBarItem(icon: Icon(Icons.search, size: 34,), label: 'Explora'),
+    //         BottomNavigationBarItem(icon: Icon(Icons.folder), label: 'Archivos'),
+    //       ],
+    //     ),
     );
   }
 }
@@ -89,28 +91,28 @@ class _ListPublications extends StatelessWidget {
 
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text('Estas seguro que desea borrar esta categoria?'),
+              title: const Text('Estas seguro que desea borrar esta categoria?'),
               content: SingleChildScrollView(
                 child: ListBody(
-                  children: [
+                  children: const[
                     Text('Si eliminas la publicacion, no podras recuperarla'),
                   ],
                 ),
               ),
               actions: [
                 ElevatedButton(
-                  child: new Text('Cancelar'),
+                  child: const Text('Cancelar'),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
                 ),
                 ElevatedButton(
-                  child: new Text('Ok'),
                   style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.red)),
                   onPressed: () {
                     publicationProvider.deletePublicacion(publicationProvider.publicaciones[index]);
                     Navigator.of(context).pop();
                   },
+                  child: const Text('Ok'),
                 ),
               ],
             );
@@ -136,7 +138,6 @@ class _ListPublications extends StatelessWidget {
                         CircleAvatar(
                       onBackgroundImageError: (exception, stackTrace) => Colors.white,
                       backgroundImage: NetworkImage(authService.usuario.imagen!= null && authService.usuario.imagen!= '' ? authService.usuario.imagen! : 'https://placeholder.com/300x300')),
-                      // backgroundImage: NetworkImage('https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/one-piece-luffy-1589967502.jpg')),
                     const SizedBox( width: 10,),
                     Text(publicationProvider.publicaciones[index].profesor!.nombreCompleto ,textAlign: TextAlign.start, style: const TextStyle( fontSize: 18,fontWeight: FontWeight.bold, color: Colors.black),),
                       ],
@@ -163,7 +164,6 @@ class _ListPublications extends StatelessWidget {
                   ],
                 ),
                 Container(
-                  height: 150,
                   child: SingleChildScrollView(
                     child: Padding(
                     padding: const EdgeInsets.only(left: 30),

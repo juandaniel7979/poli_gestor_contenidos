@@ -20,6 +20,7 @@ class PublicationFormProvider extends ChangeNotifier {
     print(publication.descripcion);
     print(publication.id);
     print(publication.estado);
+      print(publication.imagenes);
     
     return formKey.currentState?.validate() ?? false;
   }

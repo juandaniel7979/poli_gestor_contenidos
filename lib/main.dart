@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:poli_gestor_contenidos/providers/providers.dart';
 import 'package:poli_gestor_contenidos/screens/feedback_screen.dart';
 import 'package:poli_gestor_contenidos/screens/profile_screen.dart';
+import 'package:poli_gestor_contenidos/screens/publication_tabs.dart';
 import 'package:poli_gestor_contenidos/screens/screens.dart';
 import 'package:poli_gestor_contenidos/screens/subcategory_edit_screen.dart';
 import 'package:poli_gestor_contenidos/services/auth_services.dart';
@@ -76,6 +77,7 @@ class _MyAppState extends State<MyApp> {
         LoginScreen.routerName            : ( _ ) => const LoginScreen(),
         ListCategoriesScreen.routerName   : ( _ ) => const ListCategoriesScreen(),
         PublicationEditScreen.routerName  : ( _ ) => const PublicationEditScreen(),
+        PublicationTabsPage.routerName    : ( _ ) =>       PublicationTabsPage(),
         ProfileScreen.routerName          : ( _ ) => const ProfileScreen(),
         RegisterScreen.routerName         : ( _ ) => const RegisterScreen(),
         SettingsScreen.routerName         : ( _ ) => const SettingsScreen(),

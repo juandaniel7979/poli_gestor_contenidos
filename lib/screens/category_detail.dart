@@ -7,6 +7,7 @@ import 'package:poli_gestor_contenidos/providers/publication_provider.dart';
 import 'package:poli_gestor_contenidos/providers/subcategory_provider.dart';
 import 'package:poli_gestor_contenidos/screens/feedback_screen.dart';
 import 'package:poli_gestor_contenidos/screens/list_categories_screen.dart';
+import 'package:poli_gestor_contenidos/screens/publication_tabs.dart';
 import 'package:poli_gestor_contenidos/screens/subcategory_edit_screen.dart';
 import 'package:poli_gestor_contenidos/services/auth_services.dart';
 import 'package:poli_gestor_contenidos/share_preferences/preferences.dart';
@@ -27,7 +28,7 @@ class CategoryDetailScreen extends StatelessWidget {
     final usuario = Provider.of<AuthService>(context);
 
     return 
-    usuario.usuario.uid== categoria.selectedCategory.id
+    usuario.usuario.uid== categoria.selectedCategory.idProfesor
     ?  ProfesorScreenView(suscripcion: suscripcion, subcategoria: subcategoria, categoria: categoria)
     : EstudianteScreenView( subcategoria: subcategoria, categoria: categoria);
   }
@@ -240,9 +241,11 @@ class _SubcategoryCard extends StatelessWidget {
           publicationProvider.selectedPublicacion.idSubcategoria = subcategoria.subcategorias[index].id;
           publicationProvider.publicaciones = [];
           publicationProvider.getPublicaciones();
-          Navigator.pushNamed(context, FeedbackScreen.routerName);
+          Navigator.pushNamed(context, PublicationTabsPage.routerName);
+          // Navigator.pushNamed(context, FeedbackScreen.routerName);
         }else{
-          Navigator.pushNamed(context, FeedbackScreen.routerName);
+          // Navigator.pushNamed(context, FeedbackScreen.routerName);
+          Navigator.pushNamed(context, PublicationTabsPage.routerName);
 
         }
       },

@@ -29,7 +29,7 @@ class LoginScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     const SizedBox( height: 10,),
-                    Text('Login', style: Theme.of(context).textTheme.headline4,),
+                    Text('Iniciar sesion', style: Theme.of(context).textTheme.headline4,),
                     const SizedBox( height:30,),   
                     ChangeNotifierProvider(
                       create:  ( _ ) => LoginFormProvider(),

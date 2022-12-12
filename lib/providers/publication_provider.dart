@@ -23,6 +23,7 @@ class PublicationProvider with ChangeNotifier {
   bool isSaving= false;
   final storage = const FlutterSecureStorage();
 
+  // File? newPictureFile;
   File? newPictureFile;
 
   Map<String,List<Publicacion>> categoriesByTag = {};
@@ -169,13 +170,14 @@ class PublicationProvider with ChangeNotifier {
   
   
   void updateSelectedPublicationImage (String path) async {
-
-    // selectedPublicacion.imagenes.add(path) ; 
-    newPictureFile = File.fromUri(Uri(path: path));
-    notifyListeners();
+      // selectedPublicacion.imagenes.add(path); 
+      newPictureFile = File.fromUri(Uri(path: path));
+      notifyListeners();
   }
 
+
   Future<String?> uploadImage() async {
+
     if ( newPictureFile == null) return null;
     isSaving = true;
     notifyListeners();

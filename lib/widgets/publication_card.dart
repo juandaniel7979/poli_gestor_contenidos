@@ -22,7 +22,7 @@ class PublicationCard extends StatelessWidget {
         children: [
           // _BackgroundImage( url: publication.picture,),
           publication.imagenes.length>0
-          ? _BackgroundImage( url: publication.imagenes[1],)
+          ? _BackgroundImage( url: publication.imagenes[0],)
           :Container(height: 25,)
         ],
       ),

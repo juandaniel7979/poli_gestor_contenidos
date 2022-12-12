@@ -181,6 +181,7 @@ class CategoryProvider with ChangeNotifier {
     final Map<String, dynamic> decodedResp = json.decode( resp.body);
 
     if( decodedResp.containsKey('id_profesor')) {
+      categoria.id = decodedResp['_id'];
       categorias.add(categoria);
       final index = categorias.indexWhere((element) => element.id == categoria.id);
       categorias[index] = categoria;
